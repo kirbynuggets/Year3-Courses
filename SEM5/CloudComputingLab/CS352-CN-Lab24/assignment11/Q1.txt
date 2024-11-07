@@ -1,0 +1,110 @@
+1. Find the IP address of your system using <ipconfig>. Record the result.
+Record the subnet mask.
+
+Ans:Connection-specific DNS Suffix  . : iiitg.ac.in
+   IPv4 Address. . . . . . . . . . . : 10.2.1.123
+   Subnet Mask . . . . . . . . . . . : 255.255.224.0
+   Default Gateway . . . . . . . . . : 10.2.0.1
+
+2. Find another IP address within your subnet (you can guess this from your subnet mask.
+Not all the IPs in your subnet may be allocated).
+Ping that IP address (<ping ip_address>) and record the result.
+
+Ans: PS C:\Users\Pavilion> ping 10.2.1.50
+
+Pinging 10.2.1.50 with 32 bytes of data:
+Reply from 10.2.1.123: Destination host unreachable.
+Reply from 10.2.1.123: Destination host unreachable.
+Reply from 10.2.1.123: Destination host unreachable.
+Reply from 10.2.1.123: Destination host unreachable.
+
+Ping statistics for 10.2.1.50:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+
+trying with default gateway:
+PS C:\Users\Pavilion> ping 10.2.0.1
+
+Pinging 10.2.0.1 with 32 bytes of data:
+Reply from 10.2.0.1: bytes=32 time=2ms TTL=255
+Reply from 10.2.0.1: bytes=32 time=12ms TTL=255
+Reply from 10.2.0.1: bytes=32 time=17ms TTL=255
+Reply from 10.2.0.1: bytes=32 time=8ms TTL=255
+
+Ping statistics for 10.2.0.1:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 2ms, Maximum = 17ms, Average = 9ms
+
+3. What is the address of the default gateway? In the list of IP addresses allowed by the subnet
+mask, do you find anything special about the address of the default gateway?
+
+Ans: Default Gateway: 10.2.0.1
+Yes, it's typically the starting IP address in a subnet and often reserved for routing traffic outside the local network.
+
+4. Find your external IP address using https://www.whatismyip.com/. Is this different from the
+address you found above?
+
+Ans: External IP: 14.139.197.66
+This is because your internal IP is part of a private network range (10.x.x.x), which is not routable on the public internet.
+Your external IP is what your network uses to communicate with the internet and is assigned by your Internet Service Provider (ISP)
+(Concept of subnetting/ site router)
+
+Comparison: This public IP is different from the internal private IP,
+indicating that your network is behind a router or firewall performing NAT.
+
+5. Click on the IP address provided by https://www.whatismyip.com and explore further. What
+is the name of the ASN that you belong to? What is its number?
+
+Ans: ASN: 55824- NKN Core Network
+
+6. What is the ISP of your network?
+
+Ans: ISP: Iiit Assam
+
+7. Give an example of another IP address belonging to the same ASN. To which organisation does it belong?
+
+Ans: NKN Core Network
+
+8. Use tracert (same as traceroute) to trace the path to <iiitg.ac.in> What do you find? Explain the entries.
+
+Ans:   1     2 ms     4 ms     2 ms  10.2.0.2
+       2     4 ms     3 ms     1 ms  192.168.253.252
+       3     *        *        *     Request timed out.
+
+9. Find the ip address of the domain (of I I T Guwahati) iitg.ac.in using <ping iitg.ac.in>. Does
+this machine belong to the same ASN as IIIT Guwahati? Who is their ISP?
+
+Ans. IP address of IITG: 14.139.196.75
+ASN: 55847
+ISP: Indian Institute of Technology (IIT) Guwahati
+
+10. Check your ARP cache using arp -a. Now ping an IP address that is reachable from your
+machine, to which you have not yet connected. Check your ARP cache again. Do you see a
+difference? Why?
+
+Ans.
+
+11. Find the routing table and the list of interfaces on your system using <netstat -r> . What is
+the MAC address of the interface using which you are connected to the network?
+
+Ans. Interface List
+ 13...00 ff 69 b7 7d a9 ......ExpressVPN TAP Adapter
+  7...........................ExpressVPN TUN Driver
+ 15...36 6f 24 c8 2d 2f ......Microsoft Wi-Fi Direct Virtual Adapter
+ 18...36 6f 24 c8 2d 3f ......Microsoft Wi-Fi Direct Virtual Adapter #2
+ 17...18 bb cc e7 58 ff ......MediaTek MT7921 Wi-Fi 6 802.11ax PCIe Adapter
+  1...........................Software Loopback Interface 1
+ 60...00 15 5d 33 93 1e ......Hyper-V Virtual Ethernet Adapter
+
+by ipconfig /all: 36-6F-24-C8-2D-2F
+
+12. Compare the round-trip times to:
+
+Ans. Below are the results from the ping command:
+
+www.berkeley.edu: RTT =  Minimum = 245ms, Maximum = 344ms, Average = 270ms
+www.mit.edu: RTT = Minimum = 93ms, Maximum = 143ms, Average = 106ms
+www.ucl.ac.uk: RTT =  Minimum = 95ms, Maximum = 108ms, Average = 102ms
+www.usyd.edu.au: RTT = [RTT value] ms
+www.uct.ac.za: RTT = [RTT value] ms
+

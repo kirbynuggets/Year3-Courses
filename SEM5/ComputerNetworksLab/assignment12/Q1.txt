@@ -1,0 +1,35 @@
+1. Filter tcp packets in Wireshark. What is the IP address and TCP port number used by the
+client computer (source) that is transferring the alice.txt file to gaia.cs.umass.edu? To
+answer this question, it’s probably easiest to select an HTTP message and explore the details
+of the TCP packet used to carry this HTTP message, using the “details of the selected packet
+header window”
+
+Ans. My IP (source): 10.3.12.30
+     Destination IP (gaia.cs.umass.edu): 128.119.245.12
+
+2. What is the IP address of gaia.cs.umass.edu? On what port number is it sending and
+receiving TCP segments for this connection?
+
+Ans. IP (gaia.cs.umass.edu): 128.119.245.12
+     Source Port: 51262
+     Destination Port: 80
+
+3. What is the sequence number of the TCP SYN segment that is used to initiate the TCP
+connection between the client computer and gaia.cs.umass.edu? (Note: this is the “raw”
+sequence number carried in the TCP segment itself; it is NOT the packet # in the “No.”
+column in the Wireshark window.)
+
+Ans. 2093804234
+
+4. What is the sequence number of the SYNACK segment sent by gaia.cs.umass.edu to the
+client computer in reply to the SYN? What is it in the segment that identifies the segment as
+a SYNACK segment?
+
+Ans.704802792
+
+The segment is identified as a SYN-ACK segment because both the SYN and ACK flags are set to 1. In Wireshark, you’ll see this in the Info column, where it will display something like [SYN, ACK]. This combination of flags (SYN and ACK both being set) indicates that the segment is a SYN-ACK packet, which is sent in response to an initial SYN segment to acknowledge the request to establish a TCP connection.
+
+5. What is the value of the Acknowledgement field in the SYNACK segment? How did
+gaia.cs.umass.edu determine that value?
+
+Ans. Acknowledgment number (raw): 2093804235
