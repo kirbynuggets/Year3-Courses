@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8d219998-6df8-4776-8473-c8c848b3c5ca" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2k5QvHBbJQLjtvNtr7zeory9sqg" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.Problem1.executor": "Run",
+    "Python.Problem10.executor": "Run",
+    "Python.Problem11.executor": "Run",
+    "Python.Problem12.executor": "Run",
+    "Python.Problem13.executor": "Run",
+    "Python.Problem14.executor": "Run",
+    "Python.Problem2.executor": "Run",
+    "Python.Problem3.executor": "Run",
+    "Python.Problem4.executor": "Run",
+    "Python.Problem5.executor": "Run",
+    "Python.Problem6.executor": "Run",
+    "Python.Problem7.executor": "Run",
+    "Python.Problem8.executor": "Run",
+    "Python.Problem9.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/knuggets/Projects/Chatbot",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab9" />
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab7\myapp.zip" />
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab6" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab7\myapp" />
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab7" />
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab8" />
+      <recent name="\\wsl.localhost\Ubuntu\home\knuggets\SEM5\CloudComputingLab\Lab7\myapp\templates" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.18968.29" />
+        <option value="bundled-python-sdk-f5635417b835-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.18968.29" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8d219998-6df8-4776-8473-c8c848b3c5ca" name="Changes" comment="" />
+      <created>1722571186799</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1722571186799</updated>
+      <workItem from="1723476791172" duration="6274000" />
+      <workItem from="1723782034565" duration="6106000" />
+      <workItem from="1723825765432" duration="1163000" />
+      <workItem from="1724047500913" duration="50000" />
+      <workItem from="1724385293819" duration="3244000" />
+      <workItem from="1724832479241" duration="9000" />
+      <workItem from="1726200389338" duration="3954000" />
+      <workItem from="1726555103012" duration="115000" />
+      <workItem from="1728019259301" duration="13024000" />
+      <workItem from="1728201410511" duration="36000" />
+      <workItem from="1729225669013" duration="712000" />
+      <workItem from="1729304883219" duration="3824000" />
+      <workItem from="1729747380861" duration="13573000" />
+      <workItem from="1729832036311" duration="3955000" />
+      <workItem from="1730101002549" duration="234000" />
+      <workItem from="1730119473963" duration="21010000" />
+      <workItem from="1730214764096" duration="7835000" />
+      <workItem from="1730277773359" duration="8434000" />
+      <workItem from="1730302959060" duration="8593000" />
+      <workItem from="1730440148012" duration="74000" />
+      <workItem from="1730996749937" duration="5572000" />
+      <workItem from="1731005171129" duration="78000" />
+      <workItem from="1732247846105" duration="9401000" />
+      <workItem from="1733566515051" duration="1104000" />
+      <workItem from="1733588926969" duration="708000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Lab1/Problem1.py</url>
+          <line>11</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem8.coverage" NAME="Problem8 Coverage Results" MODIFIED="1723485214714" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem13.coverage" NAME="Problem13 Coverage Results" MODIFIED="1723786111643" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem7.coverage" NAME="Problem7 Coverage Results" MODIFIED="1723484984016" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem12.coverage" NAME="Problem12 Coverage Results" MODIFIED="1724385819754" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem4.coverage" NAME="Problem4 Coverage Results" MODIFIED="1723484518820" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem6.coverage" NAME="Problem6 Coverage Results" MODIFIED="1723484863121" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem11.coverage" NAME="Problem11 Coverage Results" MODIFIED="1724388608561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem3.coverage" NAME="Problem3 Coverage Results" MODIFIED="1723484434299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem1.coverage" NAME="Problem1 Coverage Results" MODIFIED="1723782281147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem2.coverage" NAME="Problem2 Coverage Results" MODIFIED="1724388393516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem10.coverage" NAME="Problem10 Coverage Results" MODIFIED="1723485507619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem5.coverage" NAME="Problem5 Coverage Results" MODIFIED="1724388511566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem9.coverage" NAME="Problem9 Coverage Results" MODIFIED="1723785500757" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+    <SUITE FILE_PATH="coverage/CloudComputingLab$Problem14.coverage" NAME="Problem14 Coverage Results" MODIFIED="1724385365048" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Lab1" />
+  </component>
+</project>
