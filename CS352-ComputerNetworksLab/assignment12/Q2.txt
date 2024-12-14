@@ -1,0 +1,35 @@
+1. Configure all routers to use RIP. From Wired_Node_1, start an application with start time as
+40. Observe the path taken by the packets.
+a. Why do they take that path? (1 Mark for viva)
+
+RIP is a distance-vector routing protocol that uses hop count as the metric to determine the shortest path. The hop count represents the number of routers a packet needs to traverse to reach its destination.
+a. Path selection:
+
+When an application starts on Wired_Node_1, data packets will be sent towards Wired_Node_2.
+As RIP uses hop count as the metric, the path will be selected based on the least number of routers traversed.
+The path will likely involve going through routers Router_8, Router_9, Router_10, Router_11, Router_7, and finally to Wired_Node_2. This path has the fewest hops compared to other possible routes.
+
+
+b. Observe the RIP messages. Demonstrate the router forwarding tables. (2 Marks for
+viva)
+
+b. RIP messages and routing tables:
+
+RIP messages are used to exchange routing information between routers. These messages contain information about the distance (hop count) to reachable destinations.
+Routers maintain routing tables that store the distance and next hop information for various destinations. The routing tables are updated based on the RIP messages received from other routers.
+
+2. Configure all routers to use OSPF. Configure the costs of links3 and 4 to be 5000 each. From
+Wired_Node_1, start an application with start time as 40. Observe the path taken by the
+packets.
+a. Why do they take that path? (1 Mark for viva)
+
+OSPF is a link-state routing protocol that uses cost as the metric for determining the shortest path. The cost is an arbitrary value assigned to each link in the network.
+a. Path selection:
+
+When the cost of links 3 and 4 is set to 5000, the path selection will change significantly. The network will prioritize paths with lower costs, avoiding links 3 and 4 whenever possible.
+The most likely path will involve going through Router_5, Router_6, Router_ 7, and then to Wired_Node_2, as this path will have a lower total cost compared to paths that include links 3 and 4.
+
+b. Observe the OSPF messages. View the router forwarding tables (1 Mark for viva)
+
+OSPF messages are used to share link-state information among routers. These messages help routers build a complete topology of the network, allowing them to calculate the shortest path to each destination based on the assigned costs.
+The routing tables in OSPF contain information about the cost to reach each destination and the next hop for forwarding packets. These tables are updated dynamically as the network topology changes or as link costs are modified.

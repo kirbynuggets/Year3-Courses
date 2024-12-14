@@ -1,0 +1,15 @@
+2. linear regression: dataset generation, simple linear regression, mse
+3. gradient descent, stochastic gradient descent,
+   training, testing, validation,
+   hyperparameters, plotting
+4. training, testing, validation,
+   gradient descent,. Evaluatethemodelinthevalidationphase.
+    Findthefinalvalueoftheparametersafterthevalidationphase.
+    Test your model on the testing data.
+5. logistic regression: dataset generation, normalisation,
+   gradient descent, accuracy, confusion matrix,
+   cross validation method; (extended question)
+6. clustering: KMeans & KMedoids using Euclidean Distance
+EA1. Linear Regression: dataset generation, mse, values of coefficient,
+     impact of each feature
+EA2. kMedoids and finding effectiveness
