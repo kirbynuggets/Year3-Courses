@@ -1,0 +1,2 @@
+Hi! This is assignment1 of Compilers Lab.
+We are learning the implementation of Lexical Analyzers.
