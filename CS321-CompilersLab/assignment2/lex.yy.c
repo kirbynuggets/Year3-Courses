@@ -322,6 +322,9 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
+
+#define yywrap() (/*CONSTCOND*/1)
+#define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -360,30 +363,28 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[34] =
+static const flex_int16_t yy_accept[14] =
     {   0,
-        0,    0,    5,    3,    3,    0,    0,    0,    0,    0,
-        2,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-        0,    1,    0
+        0,    0,    5,    3,    4,    3,    0,    1,    0,    1,
+        0,    2,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    3,
-        4,    5,    6,    1,    1,    7,    8,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        9,    1,   10,   11,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    2,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    1,    1,    4,
+        1,    5,    1,    1,    6,    6,    6,    6,    6,    6,
+        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
+        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
+        1,    1,    1,    1,    1,    1,    6,    6,    6,    6,
 
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
+        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
+        6,    6,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -400,44 +401,37 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[12] =
+static const YY_CHAR yy_meta[7] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1
+        1,    1,    2,    3,    4,    5
     } ;
 
-static const flex_int16_t yy_base[35] =
+static const flex_int16_t yy_base[19] =
     {   0,
-       28,   27,   34,   37,    0,   24,   25,   20,   25,   24,
-       37,   18,   22,   21,   19,   21,   14,   11,   13,   15,
-        9,    9,    6,   11,    5,    9,    8,    6,    7,    5,
-        1,   37,   37,    0
+       21,   18,   19,    0,    0,    0,    0,    0,   13,    0,
+        9,   26,   26,    6,   11,    0,   15,   19
     } ;
 
-static const flex_int16_t yy_def[35] =
+static const flex_int16_t yy_def[19] =
     {   0,
-       34,   34,   33,   33,   33,   33,   33,   33,   33,   33,
-       33,   33,   33,   33,   33,   33,   33,   33,   33,   33,
-       33,   33,   33,   33,   33,   33,   33,   33,   33,   33,
-       33,   33,    0,   33
+       14,   14,   13,   15,   13,   15,   16,   17,   18,   17,
+       18,   13,    0,   13,   13,   13,   13,   13
     } ;
 
-static const flex_int16_t yy_nxt[49] =
+static const flex_int16_t yy_nxt[33] =
     {   0,
-        4,   33,   33,   33,    6,   33,   33,    7,   32,   31,
-       30,   29,   28,   27,   26,   25,   24,   23,   22,   21,
-       20,   19,   18,   17,   16,   15,   14,   13,   12,   11,
-       10,    9,    8,   33,    5,    5,    3,   33,   33,   33,
-       33,   33,   33,   33,   33,   33,   33,   33
+       13,    7,   13,   13,    9,    8,    4,    4,    4,    4,
+        4,    6,    6,   12,    6,    6,   10,   12,   13,   10,
+       11,    5,   11,   11,    5,    3,   13,   13,   13,   13,
+       13,   13
     } ;
 
-static const flex_int16_t yy_chk[49] =
+static const flex_int16_t yy_chk[33] =
     {   0,
-       34,    0,    0,    0,    5,    0,    0,    5,   31,   30,
-       29,   28,   27,   26,   25,   24,   23,   22,   21,   20,
-       19,   18,   17,   16,   15,   14,   13,   12,   10,    9,
-        8,    7,    6,    3,    2,    1,   33,   33,   33,   33,
-       33,   33,   33,   33,   33,   33,   33,   33
+        0,    5,    0,    0,   16,    5,   14,   14,   14,   14,
+       14,   15,   15,   11,   15,   15,   17,    9,    3,   17,
+       18,    2,   18,   18,    1,   13,   13,   13,   13,   13,
+       13,   13
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -454,11 +448,30 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "Q1.l"
-#line 2 "Q1.l"
+#line 1 "Q3.l"
+#line 2 "Q3.l"
 #include <stdio.h>
-#line 461 "lex.yy.c"
-#line 462 "lex.yy.c"
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store HTML tag and its count
+typedef struct {
+    char* tag_name;
+    int count;
+} TagCount;
+
+// Array to store tag counts (you can dynamically resize this if needed)
+#define MAX_TAGS 100
+TagCount tag_counts[MAX_TAGS];
+int num_tags = 0;
+
+// Function to find or add a tag and increment its count
+void add_tag(const char* tag_name);
+
+// Function to print the tag counts
+void print_tag_counts();
+#line 474 "lex.yy.c"
+#line 475 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -675,10 +688,10 @@ YY_DECL
 		}
 
 	{
-#line 5 "Q1.l"
+#line 26 "Q3.l"
 
 
-#line 682 "lex.yy.c"
+#line 695 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -705,13 +718,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 34 )
+				if ( yy_current_state >= 14 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 37 );
+		while ( yy_base[yy_current_state] != 26 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -737,28 +750,38 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 7 "Q1.l"
-{}     // Match and remove multi-line comments (/* ... */)
+#line 28 "Q3.l"
+{ 
+    // Extract tag name (excluding '<')
+    char* tag_name = strdup(yytext + 1); 
+    add_tag(tag_name);
+    free(tag_name);
+}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 10 "Q1.l"
-{}     // Match and remove single-line comments (//...)
+#line 35 "Q3.l"
+{
+    // Extract tag name (excluding '</')
+     char* tag_name = strdup(yytext + 2);
+     // Remove the trailing '>'
+     tag_name[strlen(tag_name) - 1] = '\0';
+    add_tag(tag_name);
+    free(tag_name);
+}
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 13 "Q1.l"
-{ 
-    fputc(yytext[0], yyout);        // Copy everything else to the output file
-}
+#line 44 "Q3.l"
+{ /* Ignore content outside of tags */ }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 17 "Q1.l"
+#line 46 "Q3.l"
 ECHO;
 	YY_BREAK
-#line 762 "lex.yy.c"
+#line 785 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1055,7 +1078,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 34 )
+			if ( yy_current_state >= 14 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1083,11 +1106,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 34 )
+		if ( yy_current_state >= 14 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 33);
+	yy_is_jam = (yy_current_state == 13);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1763,26 +1786,56 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 17 "Q1.l"
+#line 46 "Q3.l"
 
 
-int main() {
-    yyin = fopen("Q1input.java", "r");  // Open the input Java file
-    yyout = fopen("Q1output.java", "w"); // Output file without comments
-
-    if (yyin == NULL || yyout == NULL) {
-        printf("Error opening files!\n");
-        return 1;
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <html_file>\n", argv[0]);
+        return EXIT_FAILURE;
     }
 
-    yylex();  // Start lexical analysis
+    yyin = fopen(argv[1], "r");
+    if (!yyin) {
+        perror("Error opening input file");
+        return EXIT_FAILURE;
+    }
+
+    yylex();
 
     fclose(yyin);
-    fclose(yyout);
+
+    print_tag_counts();
 
     return 0;
 }
 
-int yywrap() {
-    return 1;
+// Function to find or add a tag and increment its count
+void add_tag(const char* tag_name) {
+    // Search for existing tag
+    for (int i = 0; i < num_tags; i++) {
+        if (strcmp(tag_counts[i].tag_name, tag_name) == 0) {
+            tag_counts[i].count++;
+            return;
+        }
+    }
+
+    // Add new tag if not found
+    if (num_tags < MAX_TAGS) {
+        tag_counts[num_tags].tag_name = strdup(tag_name);
+        tag_counts[num_tags].count = 1;
+        num_tags++;
+    } else {
+        fprintf(stderr, "Error: Maximum number of tags exceeded.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+// Function to print the tag counts
+void print_tag_counts() {
+    printf("HTML Tag Occurrence Counts:\n");
+    for (int i = 0; i < num_tags; i++) {
+        printf("%s: %d\n", tag_counts[i].tag_name, tag_counts[i].count);
+        free(tag_counts[i].tag_name); // Free the dynamically allocated tag names
+    }
 }

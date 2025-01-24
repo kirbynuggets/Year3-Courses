@@ -1,3 +1,6 @@
+/*Write a LEX program to verify whether a date (format: dd/mm/YYYY) is valid or not.
+Input: 12/10/2023 12/22/2021 Output. Valid Invalid.*/
+
 %{
 #include <stdio.h>
 #include <stdlib.h>

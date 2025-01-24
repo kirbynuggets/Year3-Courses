@@ -1,0 +1,10 @@
+
+This is a sample Java program 
+to demonstrate comment removal.
+
+
+
+Another doc comment 
+to test extraction
+
+
