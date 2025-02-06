@@ -48,7 +48,7 @@ IDENTIFIER  {LETTER}({LETTER}|{DIGIT})*
 %%
 
 int isKeyword(char *str) {
-    // Add your language's keywords here.  This is a minimal example.
+    // Added keywords here.
     char *keywords[] = {
         "int", "float", "char", "double", "void", "if", "else", "while",
         "for", "return", "struct", "union", "enum", "typedef", "static",
