@@ -7,5 +7,5 @@ int main() {
   if (value123 > 0) {
     printf("Positive\n");
   }
-  123abc = 5; // Invalid identifier
+  123abc = 5; // Invalid identifier (not to be considered as per study.)
 }
