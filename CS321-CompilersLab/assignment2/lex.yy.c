@@ -363,10 +363,10 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[13] =
+static const flex_int16_t yy_accept[21] =
     {   0,
-        0,    0,    5,    3,    3,    0,    1,    0,    0,    1,
-        2,    0
+        0,    0,    5,    4,    4,    0,    2,    0,    0,    2,
+        0,    0,    0,    3,    3,    1,    0,    0,    1,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -406,28 +406,32 @@ static const YY_CHAR yy_meta[5] =
         1,    2,    1,    1
     } ;
 
-static const flex_int16_t yy_base[15] =
+static const flex_int16_t yy_base[25] =
     {   0,
-        0,    0,   13,   14,    2,    9,    0,    8,    6,    0,
-       14,   14,    6,    8
+       21,   20,   23,   26,    0,   19,    0,   18,    4,    0,
+       16,   15,   14,   14,   26,   26,   13,   11,   26,   26,
+        8,   10,    0,   12
     } ;
 
-static const flex_int16_t yy_def[15] =
+static const flex_int16_t yy_def[25] =
     {   0,
-       12,    1,   12,   12,   12,   13,   14,   13,    8,   14,
-       12,    0,   12,   12
+       21,   21,   20,   20,   20,   22,   23,   22,   20,   23,
+        8,    9,    9,   24,   20,   20,   24,   17,   20,    0,
+       20,   20,   20,   20
     } ;
 
-static const flex_int16_t yy_nxt[19] =
+static const flex_int16_t yy_nxt[31] =
     {   0,
-        4,    4,    4,    5,    6,    7,    8,    8,   10,   11,
-        9,    9,   12,    3,   12,   12,   12,   12
+       10,   20,    6,    7,   12,   12,   13,   14,    4,    4,
+        8,    8,   17,   17,   19,   18,   18,   16,   12,   15,
+       11,    9,   20,    5,    5,    3,   20,   20,   20,   20
     } ;
 
-static const flex_int16_t yy_chk[19] =
+static const flex_int16_t yy_chk[31] =
     {   0,
-        1,    1,    1,    1,    5,    5,   13,   13,   14,    9,
-        8,    6,    3,   12,   12,   12,   12,   12
+       23,    0,    5,    5,    9,    9,    9,    9,   21,   21,
+       22,   22,   24,   24,   18,   17,   14,   13,   12,   11,
+        8,    6,    3,    2,    1,   20,   20,   20,   20,   20
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -444,14 +448,17 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "Q1.l"
-#line 2 "Q1.l"
+#line 1 "Q2.l"
+#line 2 "Q2.l"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-FILE *yyin, *yyout; // Declare yyin and yyout
-#line 454 "lex.yy.c"
-#line 455 "lex.yy.c"
+FILE *yyin, *yyout, *yydoc; 
+
+void format_and_write_doc(const char* doc_comment);
+#line 461 "lex.yy.c"
+#line 462 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -668,10 +675,10 @@ YY_DECL
 		}
 
 	{
-#line 10 "Q1.l"
+#line 13 "Q2.l"
 
 
-#line 675 "lex.yy.c"
+#line 682 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -698,13 +705,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 13 )
+				if ( yy_current_state >= 21 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 14 );
+		while ( yy_base[yy_current_state] != 26 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -729,28 +736,33 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
+/* rule 1 can match eol */
 YY_RULE_SETUP
-#line 12 "Q1.l"
-{ /* Ignore single-line comments */ }
+#line 15 "Q2.l"
+{ 
+    
+    char* doc_comment = strdup(yytext); 
+    format_and_write_doc(doc_comment);
+    free(doc_comment); 
+}
 	YY_BREAK
 case 2:
-/* rule 2 can match eol */
 YY_RULE_SETUP
-#line 13 "Q1.l"
-{ /* Ignore multi-line comments */ }
+#line 21 "Q2.l"
+{ /* Ignore single-line comments */ }
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 14 "Q1.l"
-{ ECHO; }     // Match and write non-comment lines to output
+#line 22 "Q2.l"
+{ /* Ignore multi-line comments */ }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 15 "Q1.l"
+#line 25 "Q2.l"
 ECHO;
 	YY_BREAK
-#line 754 "lex.yy.c"
+#line 766 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1047,7 +1059,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 13 )
+			if ( yy_current_state >= 21 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1075,11 +1087,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 13 )
+		if ( yy_current_state >= 21 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 12);
+	yy_is_jam = (yy_current_state == 20);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1755,26 +1767,86 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 15 "Q1.l"
+#line 25 "Q2.l"
 
 
 int main() {
-    yyin = fopen("Q1input.java", "r");
+    yyin = fopen("Q2input.java", "r");
     if (!yyin) {
         perror("Error opening input file");
         return EXIT_FAILURE;
     }
 
-    yyout = fopen("Q1output.java", "w");
+    yyout = fopen("Q2output.java", "w");
     if (!yyout) {
         perror("Error opening output file");
         fclose(yyin);
         return EXIT_FAILURE;
     }
 
-    yylex(); // Process the input file
+    yydoc = fopen("Q2comments.txt", "w");
+    if (!yydoc) {
+        perror("Error opening documentation file");
+        fclose(yyin);
+        fclose(yyout);
+        return EXIT_FAILURE;
+    }
+
+    yylex(); 
 
     fclose(yyin);
     fclose(yyout);
+    fclose(yydoc);
     return 0;
+}
+
+
+void format_and_write_doc(const char* doc_comment) {
+    char* formatted_comment = (char*)malloc(strlen(doc_comment) + 1);
+    if (formatted_comment == NULL) {
+        perror("Memory allocation error");
+        exit(EXIT_FAILURE);
+    }
+    
+    char* p = formatted_comment;
+
+    
+    const char* start = doc_comment + 3;
+    const char* end = strstr(doc_comment, "*/");
+
+    if (end == NULL) {
+        end = doc_comment + strlen(doc_comment);
+    }
+    
+    
+    while (start < end) {
+        
+        while (*start == ' ' || *start == '\t' || *start == '*') {
+            start++;
+        }
+
+        
+        const char* eol = strchr(start, '\n');
+        if (eol == NULL) {
+            eol = end;
+        }
+
+       
+        while (start < eol) {
+            *p++ = *start++;
+        }
+
+        
+        if (start < end) {
+            *p++ = '\n';
+        }
+
+        start = eol + 1; 
+    }
+    *p = '\0';
+
+    
+    fprintf(yydoc, "%s\n\n", formatted_comment);
+
+    free(formatted_comment);
 }

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-FILE *yyin, *yyout, *yydoc; // Declare yyin, yyout, and yydoc
+FILE *yyin, *yyout, *yydoc; 
 
 void format_and_write_doc(const char* doc_comment);
 %}
@@ -13,8 +13,8 @@ void format_and_write_doc(const char* doc_comment);
 %%
 
 "/**"([^*]|\*+[^*/])*\*+\/ { 
-    // Extract and format documentation comment
-    char* doc_comment = strdup(yytext); // Create a copy to modify
+    
+    char* doc_comment = strdup(yytext); 
     format_and_write_doc(doc_comment);
     free(doc_comment); 
 }
@@ -46,7 +46,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    yylex(); // Process the input file
+    yylex(); 
 
     fclose(yyin);
     fclose(yyout);
@@ -54,7 +54,7 @@ int main() {
     return 0;
 }
 
-// Function to format and write documentation comments
+
 void format_and_write_doc(const char* doc_comment) {
     char* formatted_comment = (char*)malloc(strlen(doc_comment) + 1);
     if (formatted_comment == NULL) {
@@ -64,7 +64,7 @@ void format_and_write_doc(const char* doc_comment) {
     
     char* p = formatted_comment;
 
-    // Remove "/**" and "*/"
+    
     const char* start = doc_comment + 3;
     const char* end = strstr(doc_comment, "*/");
 
@@ -72,34 +72,34 @@ void format_and_write_doc(const char* doc_comment) {
         end = doc_comment + strlen(doc_comment);
     }
     
-    // Copy and format lines
+    
     while (start < end) {
-        // Trim leading spaces and asterisks
+        
         while (*start == ' ' || *start == '\t' || *start == '*') {
             start++;
         }
 
-        // Find end of line
+        
         const char* eol = strchr(start, '\n');
         if (eol == NULL) {
             eol = end;
         }
 
-        // Copy line
+       
         while (start < eol) {
             *p++ = *start++;
         }
 
-        // Add newline if not at end
+        
         if (start < end) {
             *p++ = '\n';
         }
 
-        start = eol + 1; // Move to next line
+        start = eol + 1; 
     }
     *p = '\0';
 
-    // Write formatted comment to documentation file
+    
     fprintf(yydoc, "%s\n\n", formatted_comment);
 
     free(formatted_comment);
