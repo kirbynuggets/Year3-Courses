@@ -1,130 +1,90 @@
+
 %{
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-// Structure for a simple parse tree node
-typedef struct TreeNode {
-    char *tokenType;   // "IDENTIFIER", "OPERATOR", "INTEGER", etc.
-    char *value;      // The actual identifier, operator, or integer value
-    struct TreeNode *left;
-    struct TreeNode *right;
-} TreeNode;
+int noprt = 0, nopnd = 0, valid = 1, top = -1, l = 0, j = 0;
+char opnd[10][10], oprt[10][10], a[100];
+int expect_operand = 1; 
 
-TreeNode *root = NULL;  // Root of the parse tree (rudimentary)
-TreeNode *currentNode = NULL;  // Keep track of where to add nodes
-
-// Function to create a new parse tree node
-TreeNode *createNode(char *tokenType, char *value) {
-    TreeNode *newNode = (TreeNode *)malloc(sizeof(TreeNode));
-    if (newNode == NULL) {
-        perror("Memory allocation error");
-        exit(1);
-    }
-    newNode->tokenType = strdup(tokenType); // Duplicate the string for safety
-    newNode->value = strdup(value);       // Duplicate the string for safety
-    newNode->left = NULL;
-    newNode->right = NULL;
-    return newNode;
+void push(char c) {
+    a[++top] = c;
 }
 
-// Function to add a node to the parse tree (very simplified)
-void addNode(TreeNode *newNode) {
-    if (root == NULL) {
-        root = newNode;
-        currentNode = root;
-    } else {
-        // Very simplistic addition: always adds to the right
-        // A real parser would need much more complex logic
-        if (currentNode->left == NULL) {
-            currentNode->left = newNode;
-        } else if (currentNode->right == NULL) {
-            currentNode->right = newNode;
-        } else {
-            // If left and right are full, create a new root.
-            TreeNode *newRoot = createNode("OPERATOR", "+"); //Dummy operator
-            newRoot->left = root;
-            newRoot->right = newNode;
-            root = newRoot;
-            currentNode = newRoot;
-        }
-    }
+char pop() {
+    return a[top--];
 }
-
-// Function to print the parse tree (very simple)
-void printTree(TreeNode *node, int indent) {
-    if (node != NULL) {
-        printTree(node->right, indent + 4);
-        for (int i = 0; i < indent; i++) {
-            printf(" ");
-        }
-        printf("%s: %s\n", node->tokenType, node->value);
-        printTree(node->left, indent + 4);
-    }
-}
-
-// Function to free the parse tree
-void freeTree(TreeNode *node) {
-    if (node != NULL) {
-        freeTree(node->left);
-        freeTree(node->right);
-        free(node->tokenType);
-        free(node->value);
-        free(node);
-    }
-}
-
 %}
 
-DIGIT [0-9]
-LETTER [a-zA-Z]
-IDENTIFIER {LETTER}({LETTER}|{DIGIT}|_)*
-OPERATOR "+"|"-"|"*"|"/"
-OPEN_PAREN "("|"{"|"["
-CLOSE_PAREN ")"|"}"|"]"
-%%
-
-{OPEN_PAREN}     {
-    printf("OPEN_PAREN: %s\n", yytext);
-    TreeNode *node = createNode("OPEN_PAREN", yytext);
-    addNode(node);
-}
-{CLOSE_PAREN}    {
-    printf("CLOSE_PAREN: %s\n", yytext);
-    TreeNode *node = createNode("CLOSE_PAREN", yytext);
-    addNode(node);
-}
-{OPERATOR}       {
-    printf("OPERATOR: %s\n", yytext);
-    TreeNode *node = createNode("OPERATOR", yytext);
-    addNode(node);
-}
-{IDENTIFIER}     {
-    printf("IDENTIFIER: %s\n", yytext);
-    TreeNode *node = createNode("IDENTIFIER", yytext);
-    addNode(node);
-}
-{DIGIT}+         {
-    printf("INTEGER: %s\n", yytext);
-    TreeNode *node = createNode("INTEGER", yytext);
-    addNode(node);
-}
-[ \t\n]+         { /* Skip whitespace */ }
-.                { printf("ILLEGAL CHARACTER: %s\n", yytext); } /* Error handling*/
+%x NEGATIVE
 
 %%
-
-int yywrap() {
-    return 1;
+"(" { push('('); }
+"{" { push('{'); }
+"[" { push('['); }
+")" { if (top == -1 || pop() != '(') { valid = 0; return 0; } }
+"}" { if (top == -1 || pop() != '{') { valid = 0; return 0; } }
+"]" { if (top == -1 || pop() != '[') { valid = 0; return 0; } }
+"-" {
+    if (expect_operand) {
+        
+        BEGIN(NEGATIVE);
+    } else {
+        
+        noprt++;
+        strcpy(oprt[l], yytext);
+        l++;
+        expect_operand = 1; 
+    }
 }
+<NEGATIVE>[0-9]+ {
+   
+    nopnd++;
+    sprintf(opnd[j], "-%s", yytext);
+    j++;
+    expect_operand = 0; 
+    BEGIN(INITIAL);
+}
+"+"|"-"|"*"|"/" {
+    noprt++;
+    strcpy(oprt[l], yytext);
+    l++;
+    expect_operand = 1; 
+}
+[0-9]+|[a-zA-Z][a-zA-Z0-9_]* {
+    nopnd++;
+    strcpy(opnd[j], yytext);
+    j++;
+    expect_operand = 0;
+}
+[ \t\n] ;
+%%
 
-int main() {
-    printf("Enter the arithmetic expression: ");
+int main()
+{
+    int k;
+    printf("Enter the arithmetic expression (Enter ctrl + D to execute): ");
     yylex();
 
-    printf("\nParse Tree:\n");
-    printTree(root, 0);
-    freeTree(root);
+    if (valid == 1 && top == -1 && (nopnd - noprt) == 1)
+    {
+        printf("\nValid expression\n");
 
+        printf("The operators are\n");
+        for (k = 0; k < l; k++)
+            printf("%s \n", oprt[k]);
+
+        printf("The operands are\n");
+        for (k = 0; k < j; k++)
+            printf("%s \n", opnd[k]);
+    }
+    else
+        printf("The expression is invalid\n");
     return 0;
+}
+
+int yywrap()
+{
+    return 1;
 }
