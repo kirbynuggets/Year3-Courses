@@ -26,7 +26,7 @@ int main()
 		printf("compound sentence\n");
 }
 
-int yywrap( )
+int yywrap()
 {
 	return 1;
 }
