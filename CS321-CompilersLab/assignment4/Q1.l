@@ -1,73 +1,19 @@
 %{
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-
-int valid = 1, top = -1;
-char a[100];
-int expect_operand = 1; 
-
-void push(char c) {
-    a[++top] = c;
-}
-
-char pop() {
-    return a[top--];
-}
+#include "y.tab.h" // Including the Yacc-generated header file
+#include <stdlib.h>
+extern int yyerror(char* s); 
 %}
 
-%x NEGATIVE
-
 %%
 
-"("|"{"|"[" { push(yytext[0]); } // Push opening brackets onto the stack
-")" { if (top == -1 || pop() != '(') { valid = 0; } } // Check for matching ')'
-"}" { if (top == -1 || pop() != '{') { valid = 0; } } // Check for matching '}'
-"]" { if (top == -1 || pop() != '[') { valid = 0; } } // Check for matching ']'
-"-" {
-    if (expect_operand) {
-        // Handle negative numbers
-        BEGIN(NEGATIVE);
-    } else {
-        // Handle subtraction operator
-        expect_operand = 1; 
-    }
-}
-<NEGATIVE>[0-9]+ {
-    // Handle negative numbers
-    expect_operand = 0; 
-    BEGIN(INITIAL);
-}
-"+"|"-"|"*"|"/" {
-    // Handle operators
-    expect_operand = 1; 
-}
-[0-9]+ {
-    // Handle positive integers
-    expect_operand = 0;
-}
-[a-zA-Z][a-zA-Z0-9_]* {
-    // Handle variables (if needed)
-    expect_operand = 0;
-}
-[ \t\n] ; // Ignore whitespace
-. {
-    // Handle invalid characters
-    valid = 0;
-}
+[a-zA-Z]+ { yylval.fval = 0; /* Placeholder value */ return NUMBER; } // Treating as vars for now, though they are a part of algebraic expressions; value = 0
+[0-9]+(\.[0-9]+)?  { yylval.fval = atof(yytext); return NUMBER; } // Match floating-point numbers
+[ \t\n]            ; // Ignore whitespace
+"+"|"-"|"*"|"/"    { return yytext[0]; } // Handle operators
+"("|")"|"{"|"}"|"["|"]" { return yytext[0]; } // Handle brackets
+.                  { yyerror("Invalid character"); } // Handle invalid characters
+
 %%
-
-int main() {
-    printf("Enter the arithmetic expression (Enter ctrl + D to execute): ");
-    yylex();
-
-    if (valid == 1 && top == -1) {
-        printf("Valid expression\n");
-    } else {
-        printf("Invalid expression\n");
-    }
-    return 0;
-}
 
 int yywrap() {
     return 1;

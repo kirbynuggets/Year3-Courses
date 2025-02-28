@@ -1,47 +1,66 @@
 %{
-    /* Definition section */
-    #include <stdio.h>
-    #include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-    int yylex();
-    int yyerror(char* s);
+int yylex();
+int yyerror(char* s);
+float final_result;
+
+float divide(float a, float b) {
+    if (b == 0.0) {
+        yyerror("Error in expression: Division by zero");
+        exit(1);
+    }
+    return a / b;
+}
 %}
 
-%token NUMBER ID
+%union {
+    float fval;
+}
 
-// Setting the precedence and associativity of operators
+%token <fval> NUMBER
+%type <fval> expression term factor
+
 %left '+' '-'
 %left '*' '/'
 
-/* Rule Section */
 %%
-E : T {
-        printf("Result = %d\n", $1);
-        return 0;
-    }
+
+expression: term { $$ = $1; final_result = $$; }
+          | expression '+' term { $$ = $1 + $3; final_result = $$; }
+          | expression '-' term { $$ = $1 - $3; final_result = $$; }
+          ;
+
+term: factor { $$ = $1; }
+    | term '*' factor { $$ = $1 * $3; }
+    | term '/' factor { $$ = divide($1, $3); }
     ;
 
-T : T '+' T { $$ = $1 + $3; }
-  | T '-' T { $$ = $1 - $3; }
-  | T '*' T { $$ = $1 * $3; }
-  | T '/' T { $$ = $1 / $3; }
-  | '-' NUMBER { $$ = -$2; }
-  | '-' ID { $$ = -$2; }
-  | '(' T ')' { $$ = $2; }
-  | NUMBER { $$ = $1; }
-  | ID { $$ = $1; }
-  ;
+factor: NUMBER { $$ = $1; }
+      | '(' expression ')' { $$ = $2; }
+      | '{' expression '}' { $$ = $2; }
+      | '[' expression ']' { $$ = $2; }
+      ;
 
 %%
 
 int main() {
-    printf("Enter the expression\n");
-    yyparse();
-    return 0;
+    printf("Enter the arithmetic expression (Ctrl+D for result):");
+    int parse_result = yyparse();
+    if (parse_result == 0) {
+        printf("Final Result: %f\n", final_result);
+    }
+    return parse_result;
 }
 
-/* For printing error messages */
 int yyerror(char* s) {
-    printf("\nExpression is invalid: %s\n", s);
+    if (strcmp(s, "syntax error") == 0) {
+        printf("Invalid expression\n");
+    } else {
+        printf("%s\n", s);
+    }
+    exit(1);
     return 1;
 }
