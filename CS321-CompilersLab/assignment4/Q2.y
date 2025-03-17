@@ -3,332 +3,318 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Function declarations */
 int yylex();
-void yyerror(char* s);
+void yyerror(const char *s);
+void record_token(char *token_name, char *lexeme);
+void print_stack();
+void push(int symbol, int value);
+void pop();
+int stack_top_symbol();
+int stack_top_value();
 
-// Non-terminals and terminals
-char non_terminals[] = {'S', 'A', 'B'};
-char terminals[] = {'a', 'b', '$'};
-#define NT_COUNT 3
-#define T_COUNT 3
+/* Define max stack size */
+#define STACK_SIZE 100
 
-// Productions
-typedef struct {
-    char lhs;
-    char rhs[10];
-} Production;
+/* Parser state stack */
+struct stack_item {
+    int symbol;  /* Terminal or non-terminal symbol */
+    int value;   /* Value for expression evaluation */
+    char *name;  /* Symbol name for debugging */
+} stack[STACK_SIZE];
 
-Production productions[] = {
-    {'S', "AB"},  // 0
-    {'A', "aA"},  // 1
-    {'A', ""},    // 2 (ε)
-    {'B', "bB"},  // 3
-    {'B', ""}     // 4 (ε)
+int stack_top = -1; /* Stack pointer */
+int step_count = 0; /* For tracking parsing steps */
+
+/* For pretty-printing the parse */
+char *symbol_names[] = {
+    "NUMBER", "PLUS", "MINUS", "TIMES", "DIVIDE", 
+    "LPAREN", "RPAREN", "EOL", "E", "T", "F"
 };
-int prod_count = 5;
 
-// FIRST and FOLLOW sets
-typedef struct {
-    char set[10];
-    int size;
-} SymbolSet;
-
-SymbolSet first[NT_COUNT];
-SymbolSet follow[NT_COUNT];
-
-// Parsing table [non-terminal][terminal]
-char* parse_table[NT_COUNT][T_COUNT];
-
-// Stack for LL(1) parsing
-char stack[100];
-int top = -1;
-
-// Input buffer
-char input[100];
-int input_pos = 0;
-
-// Helper functions
-void push(char c) {
-    stack[++top] = c;
-}
-
-char pop() {
-    return stack[top--];
-}
-
-int is_non_terminal(char c) {
-    return (c == 'S' || c == 'A' || c == 'B');
-}
-
-int nt_index(char c) {
-    for (int i = 0; i < NT_COUNT; i++) {
-        if (non_terminals[i] == c) return i;
-    }
-    return -1;
-}
-
-int t_index(char c) {
-    for (int i = 0; i < T_COUNT; i++) {
-        if (terminals[i] == c) return i;
-    }
-    return -1;
-}
-
-void add_to_set(SymbolSet* set, char c) {
-    if (strchr(set->set, c) == NULL && c != '\0') {
-        set->set[set->size++] = c;
-        set->set[set->size] = '\0';
-    }
-}
-
-// Computing FIRST sets
-void compute_first() {
-    int changed;
-    do {
-        changed = 0;
-        for (int i = 0; i < prod_count; i++) {
-            int nt_idx = nt_index(productions[i].lhs);
-            char* rhs = productions[i].rhs;
-
-            if (rhs[0] == '\0') { // ε production
-                if (!strchr(first[nt_idx].set, 'e')) {
-                    add_to_set(&first[nt_idx], 'e');
-                    changed = 1;
-                }
-            } else if (strchr("ab", rhs[0])) { // Terminal
-                if (!strchr(first[nt_idx].set, rhs[0])) {
-                    add_to_set(&first[nt_idx], rhs[0]);
-                    changed = 1;
-                }
-            } else { // Non-terminal
-                int rhs_idx = nt_index(rhs[0]);
-                for (int j = 0; j < first[rhs_idx].size; j++) {
-                    if (first[rhs_idx].set[j] != 'e' && !strchr(first[nt_idx].set, first[rhs_idx].set[j])) {
-                        add_to_set(&first[nt_idx], first[rhs_idx].set[j]);
-                        changed = 1;
-                    }
-                }
-                // Only add ε to S if both A and B can derive ε (not applicable here)
-                if (strchr(first[rhs_idx].set, 'e') && strlen(rhs) > 1) {
-                    int next_idx = nt_index(rhs[1]);
-                    for (int j = 0; j < first[next_idx].size; j++) {
-                        if (first[next_idx].set[j] != 'e' && !strchr(first[nt_idx].set, first[next_idx].set[j])) {
-                            add_to_set(&first[nt_idx], first[next_idx].set[j]);
-                            changed = 1;
-                        }
-                    }
-                }
-            }
-        }
-    } while (changed);
-}
-
-// Computing FOLLOW sets
-void compute_follow() {
-    add_to_set(&follow[0], '$'); // $ for S
-    int changed;
-    do {
-        changed = 0;
-        for (int i = 0; i < prod_count; i++) {
-            char nt = productions[i].lhs;
-            char* rhs = productions[i].rhs;
-            int nt_idx = nt_index(nt);
-
-            for (int j = 0; rhs[j]; j++) {
-                if (is_non_terminal(rhs[j])) {
-                    int curr_idx = nt_index(rhs[j]);
-                    if (rhs[j+1] == '\0') {
-                        for (int k = 0; k < follow[nt_idx].size; k++) {
-                            if (!strchr(follow[curr_idx].set, follow[nt_idx].set[k])) {
-                                add_to_set(&follow[curr_idx], follow[nt_idx].set[k]);
-                                changed = 1;
-                            }
-                        }
-                    } else if (strchr("ab", rhs[j+1])) {
-                        if (!strchr(follow[curr_idx].set, rhs[j+1])) {
-                            add_to_set(&follow[curr_idx], rhs[j+1]);
-                            changed = 1;
-                        }
-                    } else {
-                        int next_idx = nt_index(rhs[j+1]);
-                        for (int k = 0; k < first[next_idx].size; k++) {
-                            if (first[next_idx].set[k] != 'e' && !strchr(follow[curr_idx].set, first[next_idx].set[k])) {
-                                add_to_set(&follow[curr_idx], first[next_idx].set[k]);
-                                changed = 1;
-                            }
-                        }
-                        if (strchr(first[next_idx].set, 'e')) {
-                            for (int k = 0; k < follow[nt_idx].size; k++) {
-                                if (!strchr(follow[curr_idx].set, follow[nt_idx].set[k])) {
-                                    add_to_set(&follow[curr_idx], follow[nt_idx].set[k]);
-                                    changed = 1;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } while (changed);
-}
-
-// Building LL(1) parsing table
-void build_parse_table() {
-    for (int i = 0; i < NT_COUNT; i++) {
-        for (int j = 0; j < T_COUNT; j++) {
-            parse_table[i][j] = NULL; // Initializing to NULL
-        }
-    }
-    for (int i = 0; i < prod_count; i++) {
-        int nt_idx = nt_index(productions[i].lhs);
-        char* rhs = productions[i].rhs;
-        char prod_str[10];
-        sprintf(prod_str, "%c -> %s", productions[i].lhs, rhs[0] ? rhs : "ε");
-
-        if (rhs[0] == '\0') { // ε production
-            for (int j = 0; j < follow[nt_idx].size; j++) {
-                int t_idx = t_index(follow[nt_idx].set[j]);
-                if (t_idx != -1) parse_table[nt_idx][t_idx] = strdup(prod_str);
-            }
-        } else if (strchr("ab", rhs[0])) { // Terminal
-            int t_idx = t_index(rhs[0]);
-            if (t_idx != -1) parse_table[nt_idx][t_idx] = strdup(prod_str);
-        } else { // Non-terminal
-            int rhs_idx = nt_index(rhs[0]);
-            for (int j = 0; j < first[rhs_idx].size; j++) {
-                if (first[rhs_idx].set[j] != 'e') {
-                    int t_idx = t_index(first[rhs_idx].set[j]);
-                    if (t_idx != -1) parse_table[nt_idx][t_idx] = strdup(prod_str);
-                }
-            }
-        }
-    }
-}
-
-// Displaying sets and table
-void display_sets() {
-    printf("\nFIRST Sets:\n");
-    for (int i = 0; i < NT_COUNT; i++) {
-        printf("FIRST(%c) = {", non_terminals[i]);
-        for (int j = 0; j < first[i].size; j++) {
-            if (first[i].set[j] == 'e') {
-                printf("ε");
-            } else {
-                printf("%c", first[i].set[j]);
-            }
-            if (j < first[i].size - 1) printf(",");
-        }
-        printf("}\n");
-    }
-    printf("\nFOLLOW Sets:\n");
-    for (int i = 0; i < NT_COUNT; i++) {
-        printf("FOLLOW(%c) = {", non_terminals[i]);
-        for (int j = 0; j < follow[i].size; j++) {
-            printf("%c", follow[i].set[j]);
-            if (j < follow[i].size - 1) printf(",");
-        }
-        printf("}\n");
-    }
-}
-
-void display_parse_table() {
-    printf("\nLL(1) Parsing Table:\n");
-    printf("  | a       b       $\n");
-    printf("--+-----------------\n");
-    for (int i = 0; i < NT_COUNT; i++) {
-        printf("%c | ", non_terminals[i]);
-        for (int j = 0; j < T_COUNT; j++) {
-            if (parse_table[i][j] == NULL) printf("        ");
-            else printf("%-7s ", parse_table[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-// LL(1) Parsing function
-void ll1_parse(char* input_str) {
-    printf("\nParsing steps:\n");
-    strcpy(input, input_str);
-    input_pos = 0;
-    top = -1;
-    push('$');
-    push('S');
-
-    while (top >= 0) {
-        char current = stack[top];
-        char lookahead = input[input_pos];
-
-        if (current == '$' && lookahead == '$') {
-            printf("Parsing successful!\n");
-            break;
-        }
-
-        if (strchr("ab$", current) && current == lookahead) { // Terminal match
-            pop();
-            input_pos++;
-        } else if (is_non_terminal(current)) {
-            int nt_idx = nt_index(current);
-            int t_idx = t_index(lookahead);
-            char* prod = parse_table[nt_idx][t_idx];
-
-            if (prod == NULL) {
-                yyerror("No valid production found");
-                return;
-            }
-
-            printf("Applied %s\n", prod);
-            pop();
-            char* rhs = strchr(prod, '>') + 2; // Skip "X -> "
-            if (rhs[0] != '\0' && strcmp(rhs, "ε") != 0) { // Non-ε production
-                for (int i = strlen(rhs) - 1; i >= 0; i--) {
-                    push(rhs[i]);
-                }
-            }
-        } else {
-            yyerror("Mismatch in parsing");
-            return;
-        }
-    }
-}
-
+/* Symbol IDs for non-terminals (must be higher than token values) */
+#define NT_E 100
+#define NT_T 101
+#define NT_F 102
 %}
 
-%token 'a' 'b' '$'
-
-%%
-
-start: /* Empty rule, parsing handled manually */
-     ;
-
-%%
-
-int main() {
-    printf("Enter the input string (use 'a', 'b', and '$' to end): ");
-    char input_str[100];
-    fgets(input_str, 100, stdin);
-    input_str[strcspn(input_str, "\n")] = '\0';
-
-    // Initialize sets
-    for (int i = 0; i < NT_COUNT; i++) {
-        first[i].size = 0;
-        first[i].set[0] = '\0';
-        follow[i].size = 0;
-        follow[i].set[0] = '\0';
-    }
-
-    compute_first();
-    compute_follow();
-    build_parse_table();
-
-    display_sets();
-    display_parse_table();
-
-    ll1_parse(input_str);
-
-    return 0;
+%union {
+    int num;
 }
 
-void yyerror(char* s) {
-    printf("Error: %s\n", s);
-    exit(1);
+%token <num> NUMBER
+%token PLUS MINUS TIMES DIVIDE
+%token LPAREN RPAREN
+%token EOL
+
+%type <num> E T F
+
+%start input
+
+%%
+
+input: /* empty */
+     | input line
+     ;
+
+line: EOL             { printf("Empty line\n"); }
+    | E EOL           { 
+                        printf("\nFinal Result: %d\n", $1);
+                        printf("Expression is VALID\n\n"); 
+                      }
+    ;
+
+E: T                  { $$ = $1; }
+ | E PLUS T           { $$ = $1 + $3; }
+ | E MINUS T          { $$ = $1 - $3; }
+ ;
+
+T: F                  { $$ = $1; }
+ | T TIMES F          { $$ = $1 * $3; }
+ | T DIVIDE F         { 
+                        if ($3 == 0) {
+                            yyerror("Division by zero");
+                            $$ = 0;
+                        } else {
+                            $$ = $1 / $3;
+                        }
+                      }
+ ;
+
+F: NUMBER             { $$ = $1; }
+ | LPAREN E RPAREN    { $$ = $2; }
+ ;
+
+%%
+
+/* Stack manipulation functions */
+void push(int symbol, int value) {
+    if (stack_top >= STACK_SIZE - 1) {
+        fprintf(stderr, "Stack overflow\n");
+        exit(1);
+    }
+    stack_top++;
+    stack[stack_top].symbol = symbol;
+    stack[stack_top].value = value;
+    
+    /* Set name for debugging */
+    if (symbol >= 100) { /* Non-terminals start at 100 */
+        stack[stack_top].name = strdup(symbol_names[symbol - 92]); /* Adjust index */
+    } else {
+        stack[stack_top].name = strdup(symbol_names[symbol - 1]); /* Adjust for token IDs */
+    }
+}
+
+void pop() {
+    if (stack_top < 0) {
+        fprintf(stderr, "Stack underflow\n");
+        exit(1);
+    }
+    free(stack[stack_top].name);
+    stack_top--;
+}
+
+int stack_top_symbol() {
+    if (stack_top < 0) return -1;
+    return stack[stack_top].symbol;
+}
+
+int stack_top_value() {
+    if (stack_top < 0) return -1;
+    return stack[stack_top].value;
+}
+
+void print_stack() {
+    printf("Stack: ");
+    for (int i = 0; i <= stack_top; i++) {
+        printf("%s ", stack[i].name);
+    }
+    printf("\n");
+}
+
+/* Record token for debug output */
+void record_token(char *token_name, char *lexeme) {
+    step_count++;
+    printf("\nStep %d: Shift %s (\"%s\")\n", step_count, token_name, lexeme);
+    
+    /* Simulate LALR parser actions */
+    if (strcmp(token_name, "NUMBER") == 0) {
+        int value = atoi(lexeme);
+        push(NUMBER, value);
+        print_stack();
+        
+        /* Reduce F -> NUMBER */
+        step_count++;
+        printf("\nStep %d: Reduce F -> NUMBER\n", step_count);
+        int val = stack_top_value();
+        pop(); /* Pop NUMBER */
+        push(NT_F, val); /* Push F */
+        print_stack();
+        
+        /* Check if we can reduce to T -> F */
+        step_count++;
+        printf("\nStep %d: Reduce T -> F\n", step_count);
+        val = stack_top_value();
+        pop(); /* Pop F */
+        push(NT_T, val); /* Push T */
+        print_stack();
+        
+        /* Check if we can reduce to E -> T */
+        step_count++;
+        printf("\nStep %d: Reduce E -> T\n", step_count);
+        val = stack_top_value();
+        pop(); /* Pop T */
+        push(NT_E, val); /* Push E */
+        print_stack();
+    }
+    else if (strcmp(token_name, "PLUS") == 0) {
+        push(PLUS, 0);
+        print_stack();
+    }
+    else if (strcmp(token_name, "MINUS") == 0) {
+        push(MINUS, 0);
+        print_stack();
+    }
+    else if (strcmp(token_name, "TIMES") == 0) {
+        push(TIMES, 0);
+        print_stack();
+    }
+    else if (strcmp(token_name, "DIVIDE") == 0) {
+        push(DIVIDE, 0);
+        print_stack();
+    }
+    else if (strcmp(token_name, "LPAREN") == 0) {
+        push(LPAREN, 0);
+        print_stack();
+    }
+    else if (strcmp(token_name, "RPAREN") == 0) {
+        push(RPAREN, 0);
+        print_stack();
+        
+        /* Reduce F -> (E) */
+        if (stack_top >= 2 && 
+            stack[stack_top].symbol == RPAREN &&
+            stack[stack_top-1].symbol == NT_E &&
+            stack[stack_top-2].symbol == LPAREN) {
+            
+            step_count++;
+            printf("\nStep %d: Reduce F -> (E)\n", step_count);
+            
+            int val = stack[stack_top-1].value;
+            pop(); /* Pop ) */
+            pop(); /* Pop E */
+            pop(); /* Pop ( */
+            push(NT_F, val);
+            print_stack();
+            
+            /* Check if we can reduce to T -> F */
+            step_count++;
+            printf("\nStep %d: Reduce T -> F\n", step_count);
+            val = stack_top_value();
+            pop(); /* Pop F */
+            push(NT_T, val);
+            print_stack();
+            
+            /* Check if we can reduce to E -> T */
+            step_count++;
+            printf("\nStep %d: Reduce E -> T\n", step_count);
+            val = stack_top_value();
+            pop(); /* Pop T */
+            push(NT_E, val);
+            print_stack();
+        }
+    }
+    else if (strcmp(token_name, "EOL") == 0) {
+        /* No need to push EOL, just process reductions */
+        process_reductions();
+    }
+}
+
+/* Process pending reductions */
+void process_reductions() {
+    /* Process binary operators from highest to lowest precedence */
+    
+    /* First handle * and / operations */
+    for (int i = 1; i < stack_top; i += 2) {
+        if ((stack[i].symbol == TIMES || stack[i].symbol == DIVIDE) &&
+            stack[i-1].symbol == NT_T && stack[i+1].symbol == NT_F) {
+            
+            step_count++;
+            printf("\nStep %d: Reduce T -> T %s F\n", step_count, 
+                  (stack[i].symbol == TIMES) ? "*" : "/");
+            
+            int left = stack[i-1].value;
+            int right = stack[i+1].value;
+            int result;
+            
+            if (stack[i].symbol == TIMES) {
+                result = left * right;
+            } else { /* DIVIDE */
+                if (right == 0) {
+                    yyerror("Division by zero");
+                    result = 0;
+                } else {
+                    result = left / right;
+                }
+            }
+            
+            /* Replace T op F with T */
+            pop(); /* Pop F */
+            pop(); /* Pop op */
+            pop(); /* Pop T */
+            push(NT_T, result);
+            print_stack();
+            
+            /* Start over since stack changed */
+            i = -1;
+        }
+    }
+    
+    /* Then handle + and - operations */
+    for (int i = 1; i < stack_top; i += 2) {
+        if ((stack[i].symbol == PLUS || stack[i].symbol == MINUS) &&
+            stack[i-1].symbol == NT_E && stack[i+1].symbol == NT_T) {
+            
+            step_count++;
+            printf("\nStep %d: Reduce E -> E %s T\n", step_count, 
+                  (stack[i].symbol == PLUS) ? "+" : "-");
+            
+            int left = stack[i-1].value;
+            int right = stack[i+1].value;
+            int result;
+            
+            if (stack[i].symbol == PLUS) {
+                result = left + right;
+            } else { /* MINUS */
+                result = left - right;
+            }
+            
+            /* Replace E op T with E */
+            pop(); /* Pop T */
+            pop(); /* Pop op */
+            pop(); /* Pop E */
+            push(NT_E, result);
+            print_stack();
+            
+            /* Start over since stack changed */
+            i = -1;
+        }
+    }
+}
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+    printf("Expression is INVALID\n");
+}
+
+int main(void) {
+    printf("LALR(1) Parser for arithmetic expressions\n");
+    printf("Enter expressions (e.g., 2+3*4) followed by Enter:\n");
+    
+    /* Initialize stack with $ (bottom marker) */
+    push(0, 0); /* 0 is just a placeholder for $ */
+    stack[0].name = strdup("$");
+    
+    yyparse();
+    return 0;
 }
