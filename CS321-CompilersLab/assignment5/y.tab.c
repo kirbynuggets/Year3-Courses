@@ -71,164 +71,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
-void yyerror(char* s);
+void yyerror(const char *s);
 int yylex();
+int yyparse();
 
-// Structure to store shift-reduce actions
-typedef struct {
-    char action[20];  // "shift" or "reduce"
-    char symbol[20];  // Symbol involved
-    char stack[100];  // Stack contents after action
-    char input[100];  // Remaining input
-    int value;        // Value after reduction (if applicable)
-} ParsingStep;
-
-ParsingStep steps[100];  // Array to store parsing steps
-int step_count = 0;      // Counter for steps
-
-// Structure for symbol table to store id values
-typedef struct {
-    char id[10];
-    int value;
-} IdEntry;
-
-IdEntry id_table[100];
-int id_count = 0;
-
-// Function to get value of an ID
-int get_id_value(char* id_name) {
-    for (int i = 0; i < id_count; i++) {
-        if (strcmp(id_table[i].id, id_name) == 0) {
-            return id_table[i].value;
-        }
-    }
-    printf("ID '%s' not found\n", id_name);
-    return 0;
-}
-
-// Function to add ID to the table
-void add_id(char* id_name, int value) {
-    strcpy(id_table[id_count].id, id_name);
-    id_table[id_count].value = value;
-    id_count++;
-}
-
-// Variables for tracking parsing state
-char stack[100];
-int stack_top = -1;
-int current_value = 0;
-
-// Stack operations
-void push(char c) {
-    stack[++stack_top] = c;
-}
-
-char pop() {
-    if (stack_top >= 0)
-        return stack[stack_top--];
-    return '\0';
-}
-
-// Functions to record parsing steps
-void record_shift(char symbol, char* remaining_input) {
-    strcpy(steps[step_count].action, "shift");
-    sprintf(steps[step_count].symbol, "%c", symbol);
-    memcpy(steps[step_count].stack, stack, stack_top + 1);
-    steps[step_count].stack[stack_top + 1] = '\0';
-    strcpy(steps[step_count].input, remaining_input);
-    steps[step_count].value = current_value;
-    step_count++;
-}
-
-void record_reduce(char* production, int result_value, char* remaining_input) {
-    strcpy(steps[step_count].action, "reduce");
-    strcpy(steps[step_count].symbol, production);
-    memcpy(steps[step_count].stack, stack, stack_top + 1);
-    steps[step_count].stack[stack_top + 1] = '\0';
-    strcpy(steps[step_count].input, remaining_input);
-    steps[step_count].value = result_value;
-    step_count++;
-    current_value = result_value;
-}
-
-// Function to display all parsing steps
-void display_steps() {
-    printf("\n%-10s %-15s %-20s %-20s %s\n", "Step", "Action", "Symbol", "Stack", "Input");
-    printf("------------------------------------------------------------------------------------\n");
-    for (int i = 0; i < step_count; i++) {
-        printf("%-10d %-15s %-20s %-20s ", i+1, steps[i].action, steps[i].symbol, steps[i].stack);
-        printf("%s", steps[i].input);
-        if (strcmp(steps[i].action, "reduce") == 0) {
-            printf(" (value: %d)", steps[i].value);
-        }
-        printf("\n");
-    }
-}
-
-// Function to collect ID values from user
-void collect_id_values(char* input) {
-    // Reset ID table
-    id_count = 0;
-    
-    // Tokenize the input to find all IDs
-    char* token;
-    char input_copy[100];
-    strcpy(input_copy, input);
-    
-    token = strtok(input_copy, " ");
-    while (token != NULL) {
-        if (strcmp(token, "id") == 0) {
-            char id_name[10];
-            sprintf(id_name, "id%d", id_count + 1);
-            printf("Enter value for %s: ", id_name);
-            int value;
-            scanf("%d", &value);
-            add_id(id_name, value);
-        }
-        token = strtok(NULL, " ");
-    }
-}
-
-// Function to check if input is valid
-int is_valid_input(char* input) {
-    // Simple validation logic
-    char* token;
-    char input_copy[100];
-    strcpy(input_copy, input);
-    
-    token = strtok(input_copy, " ");
-    int expecting_operand = 1; // Start by expecting an operand
-    
-    while (token != NULL) {
-        if (expecting_operand) {
-            if (strcmp(token, "id") == 0 || isdigit(token[0])) {
-                expecting_operand = 0; // Next token should be an operator
-            } else if (strcmp(token, "(") == 0) {
-                // Opening parenthesis is okay when expecting operand
-            } else {
-                return 0; // Invalid: expected operand but got something else
-            }
-        } else {
-            if (strcmp(token, "+") == 0 || strcmp(token, "-") == 0 || 
-                strcmp(token, "*") == 0 || strcmp(token, "/") == 0) {
-                expecting_operand = 1; // Next token should be an operand
-            } else if (strcmp(token, ")") == 0) {
-                // Closing parenthesis is okay when expecting operator
-            } else {
-                return 0; // Invalid: expected operator but got something else
-            }
-        }
-        token = strtok(NULL, " ");
-    }
-    
-    return !expecting_operand; // Valid if we're not expecting an operand at the end
-}
-
-
-#line 232 "y.tab.c"
+#line 80 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -251,10 +99,13 @@ int is_valid_input(char* input) {
 #  endif
 # endif
 
-
+/* Use api.header.include to #include this header
+   instead of duplicating it here.  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -269,15 +120,15 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    NUM = 259,                     /* NUM  */
-    PLUS = 260,                    /* PLUS  */
-    MINUS = 261,                   /* MINUS  */
-    TIMES = 262,                   /* TIMES  */
-    DIVIDE = 263,                  /* DIVIDE  */
-    LPAREN = 264,                  /* LPAREN  */
-    RPAREN = 265,                  /* RPAREN  */
-    UMINUS = 266                   /* UMINUS  */
+    NUMBER = 258,                  /* NUMBER  */
+    PLUS = 259,                    /* PLUS  */
+    MINUS = 260,                   /* MINUS  */
+    MULTIPLY = 261,                /* MULTIPLY  */
+    DIVIDE = 262,                  /* DIVIDE  */
+    LPAREN = 263,                  /* LPAREN  */
+    RPAREN = 264,                  /* RPAREN  */
+    END = 265,                     /* END  */
+    ID = 266                       /* ID  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -286,19 +137,28 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define ID 258
-#define NUM 259
-#define PLUS 260
-#define MINUS 261
-#define TIMES 262
-#define DIVIDE 263
-#define LPAREN 264
-#define RPAREN 265
-#define UMINUS 266
+#define NUMBER 258
+#define PLUS 259
+#define MINUS 260
+#define MULTIPLY 261
+#define DIVIDE 262
+#define LPAREN 263
+#define RPAREN 264
+#define END 265
+#define ID 266
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 11 "Q2.y"
+
+    int val;
+
+#line 159 "y.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -310,7 +170,7 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -318,18 +178,23 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_ID = 3,                         /* ID  */
-  YYSYMBOL_NUM = 4,                        /* NUM  */
-  YYSYMBOL_PLUS = 5,                       /* PLUS  */
-  YYSYMBOL_MINUS = 6,                      /* MINUS  */
-  YYSYMBOL_TIMES = 7,                      /* TIMES  */
-  YYSYMBOL_DIVIDE = 8,                     /* DIVIDE  */
-  YYSYMBOL_LPAREN = 9,                     /* LPAREN  */
-  YYSYMBOL_RPAREN = 10,                    /* RPAREN  */
-  YYSYMBOL_UMINUS = 11,                    /* UMINUS  */
+  YYSYMBOL_NUMBER = 3,                     /* NUMBER  */
+  YYSYMBOL_PLUS = 4,                       /* PLUS  */
+  YYSYMBOL_MINUS = 5,                      /* MINUS  */
+  YYSYMBOL_MULTIPLY = 6,                   /* MULTIPLY  */
+  YYSYMBOL_DIVIDE = 7,                     /* DIVIDE  */
+  YYSYMBOL_LPAREN = 8,                     /* LPAREN  */
+  YYSYMBOL_RPAREN = 9,                     /* RPAREN  */
+  YYSYMBOL_END = 10,                       /* END  */
+  YYSYMBOL_ID = 11,                        /* ID  */
   YYSYMBOL_YYACCEPT = 12,                  /* $accept  */
-  YYSYMBOL_start = 13,                     /* start  */
-  YYSYMBOL_expr = 14                       /* expr  */
+  YYSYMBOL_input = 13,                     /* input  */
+  YYSYMBOL_expr = 14,                      /* expr  */
+  YYSYMBOL_term = 15,                      /* term  */
+  YYSYMBOL_factor = 16,                    /* factor  */
+  YYSYMBOL_grammar_expr = 17,              /* grammar_expr  */
+  YYSYMBOL_grammar_term = 18,              /* grammar_term  */
+  YYSYMBOL_grammar_factor = 19             /* grammar_factor  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -655,18 +520,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  9
+#define YYFINAL  16
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   25
+#define YYLAST   40
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  12
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  3
+#define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  10
+#define YYNRULES  20
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  19
+#define YYNSTATES  38
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   266
@@ -714,10 +579,11 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int8 yyrline[] =
 {
-       0,   170,   170,   173,   174,   175,   176,   177,   178,   179,
-     180
+       0,    25,    25,    26,    29,    30,    31,    34,    35,    36,
+      47,    48,    49,    54,    55,    56,    60,    61,    62,    66,
+      67
 };
 #endif
 
@@ -733,9 +599,10 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "ID", "NUM", "PLUS",
-  "MINUS", "TIMES", "DIVIDE", "LPAREN", "RPAREN", "UMINUS", "$accept",
-  "start", "expr", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "NUMBER", "PLUS",
+  "MINUS", "MULTIPLY", "DIVIDE", "LPAREN", "RPAREN", "END", "ID",
+  "$accept", "input", "expr", "term", "factor", "grammar_expr",
+  "grammar_term", "grammar_factor", YY_NULLPTR
 };
 
 static const char *
@@ -745,7 +612,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-4)
+#define YYPACT_NINF (-3)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -759,8 +626,10 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       8,    -4,    -4,     8,     8,     2,    -2,    -4,    13,    -4,
-       8,     8,     8,     8,    -4,    17,    17,    -4,    -4
+      -1,    -3,    12,    -1,    -3,     3,     1,    23,    -3,     4,
+      25,    -3,    12,    -3,    17,    19,    -3,    12,    12,    -3,
+      12,    12,     5,     5,    -3,     5,     5,    -3,    -3,    23,
+      23,    -3,    -3,     5,    25,    25,    -3,    -3
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -768,20 +637,22 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,    10,     9,     0,     0,     0,     2,     7,     0,     1,
-       0,     0,     0,     0,     8,     3,     4,     5,     6
+       0,    10,     0,     0,    19,     0,     0,     4,     7,     0,
+      13,    16,     0,    11,     0,     0,     1,     0,     0,     2,
+       0,     0,     0,     0,     3,     0,     0,    12,    20,     5,
+       6,     8,     9,     0,    14,    15,    17,    18
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -3
+      -3,    -3,    27,    16,    -2,    37,    13,    14
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     5,     6
+       0,     5,    14,     7,     8,    15,    10,    11
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -789,38 +660,46 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       7,     8,     9,    10,    11,    12,    13,    15,    16,    17,
-      18,     1,     2,     0,     3,     0,     0,     4,    10,    11,
-      12,    13,     0,    14,    12,    13
+      13,     0,     1,    16,     2,    17,    18,     3,    22,    23,
+       4,    19,     0,    33,    24,     1,     4,     2,    31,    32,
+      12,    17,    18,    22,    23,     0,    27,     6,    28,    20,
+      21,    25,    26,    29,    30,    34,    35,     9,     0,    36,
+      37
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,     0,     5,     6,     7,     8,    10,    11,    12,
-      13,     3,     4,    -1,     6,    -1,    -1,     9,     5,     6,
-       7,     8,    -1,    10,     7,     8
+       2,    -1,     3,     0,     5,     4,     5,     8,     4,     5,
+      11,    10,    -1,     8,    10,     3,    11,     5,    20,    21,
+       8,     4,     5,     4,     5,    -1,     9,     0,     9,     6,
+       7,     6,     7,    17,    18,    22,    23,     0,    -1,    25,
+      26
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     4,     6,     9,    13,    14,    14,    14,     0,
-       5,     6,     7,     8,    10,    14,    14,    14,    14
+       0,     3,     5,     8,    11,    13,    14,    15,    16,    17,
+      18,    19,     8,    16,    14,    17,     0,     4,     5,    10,
+       6,     7,     4,     5,    10,     6,     7,     9,     9,    15,
+      15,    16,    16,     8,    18,    18,    19,    19
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    12,    13,    14,    14,    14,    14,    14,    14,    14,
-      14
+       0,    12,    13,    13,    14,    14,    14,    15,    15,    15,
+      16,    16,    16,    17,    17,    17,    18,    18,    18,    19,
+      19
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     3,     3,     3,     3,     2,     3,     1,
-       1
+       0,     2,     2,     2,     1,     3,     3,     1,     3,     3,
+       1,     2,     3,     1,     3,     3,     1,     3,     3,     1,
+       3
 };
 
 
@@ -1283,67 +1162,111 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* start: expr  */
-#line 170 "Q2.y"
-            { printf("\nFinal Result: %d\n", yyvsp[0]); }
-#line 1290 "y.tab.c"
+  case 2: /* input: expr END  */
+#line 25 "Q2.y"
+             { printf("Valid and result: %d\n", (yyvsp[-1].val)); }
+#line 1169 "y.tab.c"
     break;
 
-  case 3: /* expr: expr PLUS expr  */
-#line 173 "Q2.y"
-                       { yyval = yyvsp[-2] + yyvsp[0]; printf("Reduce: expr + expr -> expr (%d)\n", yyval); }
-#line 1296 "y.tab.c"
+  case 3: /* input: grammar_expr END  */
+#line 26 "Q2.y"
+                       { printf("Valid grammar expression.\n"); }
+#line 1175 "y.tab.c"
     break;
 
-  case 4: /* expr: expr MINUS expr  */
-#line 174 "Q2.y"
-                       { yyval = yyvsp[-2] - yyvsp[0]; printf("Reduce: expr - expr -> expr (%d)\n", yyval); }
-#line 1302 "y.tab.c"
+  case 4: /* expr: term  */
+#line 29 "Q2.y"
+                         { (yyval.val) = (yyvsp[0].val); }
+#line 1181 "y.tab.c"
     break;
 
-  case 5: /* expr: expr TIMES expr  */
-#line 175 "Q2.y"
-                       { yyval = yyvsp[-2] * yyvsp[0]; printf("Reduce: expr * expr -> expr (%d)\n", yyval); }
-#line 1308 "y.tab.c"
+  case 5: /* expr: expr PLUS term  */
+#line 30 "Q2.y"
+                         { printf("Reduce: %d + %d = %d\n", (yyvsp[-2].val), (yyvsp[0].val), (yyvsp[-2].val) + (yyvsp[0].val)); (yyval.val) = (yyvsp[-2].val) + (yyvsp[0].val); }
+#line 1187 "y.tab.c"
     break;
 
-  case 6: /* expr: expr DIVIDE expr  */
-#line 176 "Q2.y"
-                       { yyval = yyvsp[-2] / yyvsp[0]; printf("Reduce: expr / expr -> expr (%d)\n", yyval); }
-#line 1314 "y.tab.c"
+  case 6: /* expr: expr MINUS term  */
+#line 31 "Q2.y"
+                         { printf("Reduce: %d - %d = %d\n", (yyvsp[-2].val), (yyvsp[0].val), (yyvsp[-2].val) - (yyvsp[0].val)); (yyval.val) = (yyvsp[-2].val) - (yyvsp[0].val); }
+#line 1193 "y.tab.c"
     break;
 
-  case 7: /* expr: MINUS expr  */
-#line 177 "Q2.y"
-                              { yyval = -yyvsp[0]; printf("Reduce: -expr -> expr (%d)\n", yyval); }
-#line 1320 "y.tab.c"
+  case 8: /* term: term MULTIPLY factor  */
+#line 35 "Q2.y"
+                           { printf("Reduce: %d * %d = %d\n", (yyvsp[-2].val), (yyvsp[0].val), (yyvsp[-2].val) * (yyvsp[0].val)); (yyval.val) = (yyvsp[-2].val) * (yyvsp[0].val); }
+#line 1199 "y.tab.c"
     break;
 
-  case 8: /* expr: LPAREN expr RPAREN  */
-#line 178 "Q2.y"
-                         { yyval = yyvsp[-1]; printf("Reduce: (expr) -> expr (%d)\n", yyval); }
-#line 1326 "y.tab.c"
+  case 9: /* term: term DIVIDE factor  */
+#line 37 "Q2.y"
+        {
+            if ((yyvsp[0].val) == 0) {
+                printf("Error: Division by zero\n");
+                exit(1);
+            }
+            printf("Reduce: %d / %d = %d\n", (yyvsp[-2].val), (yyvsp[0].val), (yyvsp[-2].val) / (yyvsp[0].val));
+            (yyval.val) = (yyvsp[-2].val) / (yyvsp[0].val);
+        }
+#line 1212 "y.tab.c"
     break;
 
-  case 9: /* expr: NUM  */
-#line 179 "Q2.y"
-                      { yyval = yyvsp[0]; printf("Shift: NUM -> expr (%d)\n", yyval); }
-#line 1332 "y.tab.c"
+  case 10: /* factor: NUMBER  */
+#line 47 "Q2.y"
+                     { (yyval.val) = (yyvsp[0].val); }
+#line 1218 "y.tab.c"
     break;
 
-  case 10: /* expr: ID  */
-#line 180 "Q2.y"
-                      { 
-                        char id_name[10];
-                        sprintf(id_name, "id%d", id_count > 0 ? id_table[id_count-1].value : 1);
-                        yyval = get_id_value(id_name); 
-                        printf("Shift: ID -> expr (%d)\n", yyval); 
-                      }
-#line 1343 "y.tab.c"
+  case 11: /* factor: MINUS factor  */
+#line 48 "Q2.y"
+                     { printf("Reduce: Unary -%d\n", (yyvsp[0].val)); (yyval.val) = -(yyvsp[0].val); }
+#line 1224 "y.tab.c"
+    break;
+
+  case 12: /* factor: LPAREN expr RPAREN  */
+#line 49 "Q2.y"
+                           { (yyval.val) = (yyvsp[-1].val); }
+#line 1230 "y.tab.c"
+    break;
+
+  case 14: /* grammar_expr: grammar_expr PLUS grammar_term  */
+#line 55 "Q2.y"
+                                     { printf("Reduce: ID + ID\n"); }
+#line 1236 "y.tab.c"
+    break;
+
+  case 15: /* grammar_expr: grammar_expr MINUS grammar_term  */
+#line 56 "Q2.y"
+                                      { printf("Reduce: ID - ID\n"); }
+#line 1242 "y.tab.c"
+    break;
+
+  case 17: /* grammar_term: grammar_term MULTIPLY grammar_factor  */
+#line 61 "Q2.y"
+                                           { printf("Reduce: ID * ID\n"); }
+#line 1248 "y.tab.c"
+    break;
+
+  case 18: /* grammar_term: grammar_term DIVIDE grammar_factor  */
+#line 62 "Q2.y"
+                                         { printf("Reduce: ID / ID\n"); }
+#line 1254 "y.tab.c"
+    break;
+
+  case 19: /* grammar_factor: ID  */
+#line 66 "Q2.y"
+       { printf("Reduce: ID\n"); }
+#line 1260 "y.tab.c"
+    break;
+
+  case 20: /* grammar_factor: LPAREN grammar_expr RPAREN  */
+#line 67 "Q2.y"
+                                 { printf("Reduce: ( ID )\n"); }
+#line 1266 "y.tab.c"
     break;
 
 
-#line 1347 "y.tab.c"
+#line 1270 "y.tab.c"
 
       default: break;
     }
@@ -1536,42 +1459,16 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 188 "Q2.y"
+#line 70 "Q2.y"
 
 
-void yyerror(char *s) {
-    fprintf(stderr, "Error: %s\n", s);
-}
 
 int main() {
-    char input[100];
-    printf("Enter an expression (use 'id' for identifiers, e.g., 'id + id * id'): ");
-    fgets(input, sizeof(input), stdin);
-    input[strcspn(input, "\n")] = '\0';  // Remove trailing newline
-    
-    // Check if input is valid
-    if (!is_valid_input(input)) {
-        printf("Invalid input expression!\n");
-        return 1;
-    }
-    
-    // Collect values for IDs
-    collect_id_values(input);
-    
-    // Initialize parser
-    stack_top = -1;
-    step_count = 0;
-    
-    // Parse the expression using yacc
-    printf("\nParsing steps:\n");
-    
-    // Start parsing
-    if (yyparse() == 0) {
-        printf("\nParsing completed successfully!\n");
-        display_steps();
-    } else {
-        printf("\nParsing failed!\n");
-    }
-    
+    printf("Enter an arithmetic expression: ");
+    yyparse();
     return 0;
 }
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
+} 

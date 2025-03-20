@@ -54,15 +54,15 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    NUM = 259,                     /* NUM  */
-    PLUS = 260,                    /* PLUS  */
-    MINUS = 261,                   /* MINUS  */
-    TIMES = 262,                   /* TIMES  */
-    DIVIDE = 263,                  /* DIVIDE  */
-    LPAREN = 264,                  /* LPAREN  */
-    RPAREN = 265,                  /* RPAREN  */
-    UMINUS = 266                   /* UMINUS  */
+    NUMBER = 258,                  /* NUMBER  */
+    PLUS = 259,                    /* PLUS  */
+    MINUS = 260,                   /* MINUS  */
+    MULTIPLY = 261,                /* MULTIPLY  */
+    DIVIDE = 262,                  /* DIVIDE  */
+    LPAREN = 263,                  /* LPAREN  */
+    RPAREN = 264,                  /* RPAREN  */
+    END = 265,                     /* END  */
+    ID = 266                       /* ID  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -71,19 +71,28 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define ID 258
-#define NUM 259
-#define PLUS 260
-#define MINUS 261
-#define TIMES 262
-#define DIVIDE 263
-#define LPAREN 264
-#define RPAREN 265
-#define UMINUS 266
+#define NUMBER 258
+#define PLUS 259
+#define MINUS 260
+#define MULTIPLY 261
+#define DIVIDE 262
+#define LPAREN 263
+#define RPAREN 264
+#define END 265
+#define ID 266
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 11 "Q2.y"
+
+    int val;
+
+#line 93 "y.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
