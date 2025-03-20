@@ -362,7 +362,7 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[11] =
     {   0,
-        0,    0,    7,    5,    3,    3,    4,    1,    2,    0
+        0,    0,    7,    5,    4,    4,    3,    1,    2,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -440,11 +440,9 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "Q2.l"
 #line 2 "Q2.l"
-#include "y.tab.h"
-#include <stdlib.h>
-extern int yyerror(char* s);
-#line 447 "lex.yy.c"
-#line 448 "lex.yy.c"
+#include "y.tab.h"  
+#line 445 "lex.yy.c"
+#line 446 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -661,10 +659,10 @@ YY_DECL
 		}
 
 	{
-#line 7 "Q2.l"
+#line 5 "Q2.l"
 
 
-#line 668 "lex.yy.c"
+#line 666 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -723,36 +721,36 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 9 "Q2.l"
+#line 7 "Q2.l"
 { return 'a'; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 10 "Q2.l"
+#line 8 "Q2.l"
 { return 'b'; }
 	YY_BREAK
 case 3:
-/* rule 3 can match eol */
 YY_RULE_SETUP
-#line 11 "Q2.l"
-; // Ignore whitespace
+#line 9 "Q2.l"
+{ return '$'; }
 	YY_BREAK
 case 4:
+/* rule 4 can match eol */
 YY_RULE_SETUP
-#line 12 "Q2.l"
-{ return '$'; } // End of input marker
+#line 10 "Q2.l"
+; 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 13 "Q2.l"
-{ yyerror("Invalid character"); }
+#line 11 "Q2.l"
+{ printf("Invalid character '%s'\n", yytext); exit(1); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 15 "Q2.l"
+#line 13 "Q2.l"
 ECHO;
 	YY_BREAK
-#line 756 "lex.yy.c"
+#line 754 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1757,7 +1755,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 15 "Q2.l"
+#line 13 "Q2.l"
 
 
 int yywrap() {

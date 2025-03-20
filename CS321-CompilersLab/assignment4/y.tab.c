@@ -70,299 +70,48 @@
 #line 1 "Q2.y"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-int yylex();
-void yyerror(char* s);
+#define MAX 100
+#define TERMINALS 3
+#define NON_TERMINALS 3
 
-// Non-terminals and terminals
-char non_terminals[] = {'S', 'A', 'B'};
-char terminals[] = {'a', 'b', '$'};
-#define NT_COUNT 3
-#define T_COUNT 3
-
-// Productions
-typedef struct {
-    char lhs;
-    char rhs[10];
-} Production;
-
-Production productions[] = {
-    {'S', "AB"},  // 0
-    {'A', "aA"},  // 1
-    {'A', ""},    // 2 (ε)
-    {'B', "bB"},  // 3
-    {'B', ""}     // 4 (ε)
-};
-int prod_count = 5;
-
-// FIRST and FOLLOW sets
-typedef struct {
-    char set[10];
-    int size;
-} SymbolSet;
-
-SymbolSet first[NT_COUNT];
-SymbolSet follow[NT_COUNT];
-
-// Parsing table [non-terminal][terminal]
-char* parse_table[NT_COUNT][T_COUNT];
-
-// Stack for LL(1) parsing
-char stack[100];
+char stack[MAX];
 int top = -1;
-
-// Input buffer
-char input[100];
+char input[MAX];
 int input_pos = 0;
-
-// Helper functions
-void push(char c) {
-    stack[++top] = c;
-}
-
-char pop() {
-    return stack[top--];
-}
-
-int is_non_terminal(char c) {
-    return (c == 'S' || c == 'A' || c == 'B');
-}
-
-int nt_index(char c) {
-    for (int i = 0; i < NT_COUNT; i++) {
-        if (non_terminals[i] == c) return i;
-    }
-    return -1;
-}
-
-int t_index(char c) {
-    for (int i = 0; i < T_COUNT; i++) {
-        if (terminals[i] == c) return i;
-    }
-    return -1;
-}
-
-void add_to_set(SymbolSet* set, char c) {
-    if (strchr(set->set, c) == NULL && c != '\0') {
-        set->set[set->size++] = c;
-        set->set[set->size] = '\0';
-    }
-}
-
-// Computing FIRST sets
-void compute_first() {
-    int changed;
-    do {
-        changed = 0;
-        for (int i = 0; i < prod_count; i++) {
-            int nt_idx = nt_index(productions[i].lhs);
-            char* rhs = productions[i].rhs;
-
-            if (rhs[0] == '\0') { // ε production
-                if (!strchr(first[nt_idx].set, 'e')) {
-                    add_to_set(&first[nt_idx], 'e');
-                    changed = 1;
-                }
-            } else if (strchr("ab", rhs[0])) { // Terminal
-                if (!strchr(first[nt_idx].set, rhs[0])) {
-                    add_to_set(&first[nt_idx], rhs[0]);
-                    changed = 1;
-                }
-            } else { // Non-terminal
-                int rhs_idx = nt_index(rhs[0]);
-                for (int j = 0; j < first[rhs_idx].size; j++) {
-                    if (first[rhs_idx].set[j] != 'e' && !strchr(first[nt_idx].set, first[rhs_idx].set[j])) {
-                        add_to_set(&first[nt_idx], first[rhs_idx].set[j]);
-                        changed = 1;
-                    }
-                }
-                // Only add ε to S if both A and B can derive ε (not applicable here)
-                if (strchr(first[rhs_idx].set, 'e') && strlen(rhs) > 1) {
-                    int next_idx = nt_index(rhs[1]);
-                    for (int j = 0; j < first[next_idx].size; j++) {
-                        if (first[next_idx].set[j] != 'e' && !strchr(first[nt_idx].set, first[next_idx].set[j])) {
-                            add_to_set(&first[nt_idx], first[next_idx].set[j]);
-                            changed = 1;
-                        }
-                    }
-                }
-            }
-        }
-    } while (changed);
-}
-
-// Computing FOLLOW sets
-void compute_follow() {
-    add_to_set(&follow[0], '$'); // $ for S
-    int changed;
-    do {
-        changed = 0;
-        for (int i = 0; i < prod_count; i++) {
-            char nt = productions[i].lhs;
-            char* rhs = productions[i].rhs;
-            int nt_idx = nt_index(nt);
-
-            for (int j = 0; rhs[j]; j++) {
-                if (is_non_terminal(rhs[j])) {
-                    int curr_idx = nt_index(rhs[j]);
-                    if (rhs[j+1] == '\0') {
-                        for (int k = 0; k < follow[nt_idx].size; k++) {
-                            if (!strchr(follow[curr_idx].set, follow[nt_idx].set[k])) {
-                                add_to_set(&follow[curr_idx], follow[nt_idx].set[k]);
-                                changed = 1;
-                            }
-                        }
-                    } else if (strchr("ab", rhs[j+1])) {
-                        if (!strchr(follow[curr_idx].set, rhs[j+1])) {
-                            add_to_set(&follow[curr_idx], rhs[j+1]);
-                            changed = 1;
-                        }
-                    } else {
-                        int next_idx = nt_index(rhs[j+1]);
-                        for (int k = 0; k < first[next_idx].size; k++) {
-                            if (first[next_idx].set[k] != 'e' && !strchr(follow[curr_idx].set, first[next_idx].set[k])) {
-                                add_to_set(&follow[curr_idx], first[next_idx].set[k]);
-                                changed = 1;
-                            }
-                        }
-                        if (strchr(first[next_idx].set, 'e')) {
-                            for (int k = 0; k < follow[nt_idx].size; k++) {
-                                if (!strchr(follow[curr_idx].set, follow[nt_idx].set[k])) {
-                                    add_to_set(&follow[curr_idx], follow[nt_idx].set[k]);
-                                    changed = 1;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } while (changed);
-}
-
-// Building LL(1) parsing table
-void build_parse_table() {
-    for (int i = 0; i < NT_COUNT; i++) {
-        for (int j = 0; j < T_COUNT; j++) {
-            parse_table[i][j] = NULL; // Initializing to NULL
-        }
-    }
-    for (int i = 0; i < prod_count; i++) {
-        int nt_idx = nt_index(productions[i].lhs);
-        char* rhs = productions[i].rhs;
-        char prod_str[10];
-        sprintf(prod_str, "%c -> %s", productions[i].lhs, rhs[0] ? rhs : "ε");
-
-        if (rhs[0] == '\0') { // ε production
-            for (int j = 0; j < follow[nt_idx].size; j++) {
-                int t_idx = t_index(follow[nt_idx].set[j]);
-                if (t_idx != -1) parse_table[nt_idx][t_idx] = strdup(prod_str);
-            }
-        } else if (strchr("ab", rhs[0])) { // Terminal
-            int t_idx = t_index(rhs[0]);
-            if (t_idx != -1) parse_table[nt_idx][t_idx] = strdup(prod_str);
-        } else { // Non-terminal
-            int rhs_idx = nt_index(rhs[0]);
-            for (int j = 0; j < first[rhs_idx].size; j++) {
-                if (first[rhs_idx].set[j] != 'e') {
-                    int t_idx = t_index(first[rhs_idx].set[j]);
-                    if (t_idx != -1) parse_table[nt_idx][t_idx] = strdup(prod_str);
-                }
-            }
-        }
-    }
-}
-
-// Displaying sets and table
-void display_sets() {
-    printf("\nFIRST Sets:\n");
-    for (int i = 0; i < NT_COUNT; i++) {
-        printf("FIRST(%c) = {", non_terminals[i]);
-        for (int j = 0; j < first[i].size; j++) {
-            if (first[i].set[j] == 'e') {
-                printf("ε");
-            } else {
-                printf("%c", first[i].set[j]);
-            }
-            if (j < first[i].size - 1) printf(",");
-        }
-        printf("}\n");
-    }
-    printf("\nFOLLOW Sets:\n");
-    for (int i = 0; i < NT_COUNT; i++) {
-        printf("FOLLOW(%c) = {", non_terminals[i]);
-        for (int j = 0; j < follow[i].size; j++) {
-            printf("%c", follow[i].set[j]);
-            if (j < follow[i].size - 1) printf(",");
-        }
-        printf("}\n");
-    }
-}
-
-void display_parse_table() {
-    printf("\nLL(1) Parsing Table:\n");
-    printf("  | a       b       $\n");
-    printf("--+-----------------\n");
-    for (int i = 0; i < NT_COUNT; i++) {
-        printf("%c | ", non_terminals[i]);
-        for (int j = 0; j < T_COUNT; j++) {
-            if (parse_table[i][j] == NULL) printf("        ");
-            else printf("%-7s ", parse_table[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-// LL(1) Parsing function
-void ll1_parse(char* input_str) {
-    printf("\nParsing steps:\n");
-    strcpy(input, input_str);
-    input_pos = 0;
-    top = -1;
-    push('$');
-    push('S');
-
-    while (top >= 0) {
-        char current = stack[top];
-        char lookahead = input[input_pos];
-
-        if (current == '$' && lookahead == '$') {
-            printf("Parsing successful!\n");
-            break;
-        }
-
-        if (strchr("ab$", current) && current == lookahead) { // Terminal match
-            pop();
-            input_pos++;
-        } else if (is_non_terminal(current)) {
-            int nt_idx = nt_index(current);
-            int t_idx = t_index(lookahead);
-            char* prod = parse_table[nt_idx][t_idx];
-
-            if (prod == NULL) {
-                yyerror("No valid production found");
-                return;
-            }
-
-            printf("Applied %s\n", prod);
-            pop();
-            char* rhs = strchr(prod, '>') + 2; // Skip "X -> "
-            if (rhs[0] != '\0' && strcmp(rhs, "ε") != 0) { // Non-ε production
-                for (int i = strlen(rhs) - 1; i >= 0; i--) {
-                    push(rhs[i]);
-                }
-            }
-        } else {
-            yyerror("Mismatch in parsing");
-            return;
-        }
-    }
-}
+int current_token;
 
 
-#line 366 "y.tab.c"
+int first[NON_TERMINALS][4] = {
+    {1, 1, 0, 0},  // FIRST(S) = {a, b}
+    {1, 0, 0, 1},  // FIRST(A) = {a, ε}
+    {0, 1, 0, 0}   // FIRST(B) = {b}
+};
+int follow[NON_TERMINALS][3] = {
+    {0, 0, 1},     // FOLLOW(S) = {$}
+    {0, 1, 0},     // FOLLOW(A) = {b}
+    {0, 0, 1}      // FOLLOW(B) = {$}
+};
+int parsing_table[NON_TERMINALS][TERMINALS];  
+
+void push(char c);
+char pop();
+void displayStack();
+void displayInput();
+void error();
+void parse();
+void constructParsingTable();
+void displayFirstFollow();
+void displayParsingTable();
+int getTableIndex(char row, char col);
+void advance();
+int yylex();
+void yyerror(char *s);
+
+
+#line 115 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -825,9 +574,9 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int16 yyrline[] =
+static const yytype_int8 yyrline[] =
 {
-       0,   300,   300
+       0,    49,    49
 };
 #endif
 
@@ -1384,7 +1133,7 @@ yyreduce:
   switch (yyn)
     {
 
-#line 1388 "y.tab.c"
+#line 1137 "y.tab.c"
 
       default: break;
     }
@@ -1577,36 +1326,216 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 303 "Q2.y"
+#line 52 "Q2.y"
 
+
+void push(char c) {
+    if (top < MAX - 1) {
+        stack[++top] = c;
+    }
+}
+
+char pop() {
+    if (top >= 0) {
+        return stack[top--];
+    }
+    return '\0';
+}
+
+void displayStack() {
+    for (int i = 0; i <= top; i++) {
+        printf("%c", stack[i]);
+    }
+}
+
+void displayInput() {
+    printf("%s", &input[input_pos]);
+}
+
+void constructParsingTable() {
+    memset(parsing_table, -1, sizeof(parsing_table));
+   
+    if (first[0][0]) parsing_table[0][0] = 0;  
+    if (first[0][1]) parsing_table[0][1] = 0;  
+   
+    
+    if (first[1][0]) parsing_table[1][0] = 1;  
+   
+    
+    if (first[1][3]) {  
+        if (follow[1][0]) parsing_table[1][0] = 2;  
+        if (follow[1][1]) parsing_table[1][1] = 2;  
+        if (follow[1][2]) parsing_table[1][2] = 2;  
+    }
+   
+    
+    if (first[2][1]) parsing_table[2][1] = 3;  
+}
+
+void displayFirstFollow() {
+    printf("FIRST Sets:\n");
+    printf("FIRST(S) = {");
+    if (first[0][0]) printf("a, ");
+    if (first[0][1]) printf("b, ");
+    if (first[0][3]) printf("ε, ");
+    printf("\b\b}\n");
+   
+    printf("FIRST(A) = {");
+    if (first[1][0]) printf("a, ");
+    if (first[1][1]) printf("b, ");
+    if (first[1][3]) printf("ε, ");
+    printf("\b\b}\n");
+   
+    printf("FIRST(B) = {");
+    if (first[2][0]) printf("a, ");
+    if (first[2][1]) printf("b, ");
+    if (first[2][3]) printf("ε, ");
+    printf("\b\b}\n");
+   
+    printf("\nFOLLOW Sets:\n");
+    printf("FOLLOW(S) = {");
+    if (follow[0][0]) printf("a, ");
+    if (follow[0][1]) printf("b, ");
+    if (follow[0][2]) printf("$, ");
+    printf("\b\b}\n");
+   
+    printf("FOLLOW(A) = {");
+    if (follow[1][0]) printf("a, ");
+    if (follow[1][1]) printf("b, ");
+    if (follow[1][2]) printf("$, ");
+    printf("\b\b}\n");
+   
+    printf("FOLLOW(B) = {");
+    if (follow[2][0]) printf("a, ");
+    if (follow[2][1]) printf("b, ");
+    if (follow[2][2]) printf("$, ");
+    printf("\b\b}\n");
+}
+
+void displayParsingTable() {
+    printf("\nLL(1) Parsing Table:\n");
+    printf("\t|a\t|b\t|$\n");
+    printf("--------------------------------\n");
+    printf("S\t|%s\t|%s\t|%s\n",
+           parsing_table[0][0] == 0 ? "S→AB" : "-",
+           parsing_table[0][1] == 0 ? "S→AB" : "-",
+           parsing_table[0][2] == 0 ? "S→AB" : "-");
+    printf("A\t|%s\t|%s\t|%s\n",
+           parsing_table[1][0] == 1 ? "A→aA" : "-",
+           parsing_table[1][1] == 2 ? "A→ε" : "-",
+           parsing_table[1][2] == 2 ? "A→ε" : "-");
+    printf("B\t|%s\t|%s\t|%s\n",
+           parsing_table[2][0] == 3 ? "B→b" : "-",
+           parsing_table[2][1] == 3 ? "B→b" : "-",
+           parsing_table[2][2] == 3 ? "B→b" : "-");
+}
+
+int getTableIndex(char row, char col) {
+    int row_idx, col_idx;
+    switch(row) {
+        case 'S': row_idx = 0; break;
+        case 'A': row_idx = 1; break;
+        case 'B': row_idx = 2; break;
+        default: return -1;
+    }
+    switch(col) {
+        case 'a': col_idx = 0; break;
+        case 'b': col_idx = 1; break;
+        case '$': col_idx = 2; break;
+        default: return -1;
+    }
+    return parsing_table[row_idx][col_idx];
+}
+
+void advance() {
+    current_token = yylex();
+    if (current_token != 0) {
+        input[input_pos++] = current_token;
+    }
+}
+
+void parse() {
+    push('$');
+    push('S');
+    
+    printf("\nParsing Process:\n");
+    printf("Stack\t\t\t\tAction\n");
+    printf("--------------------------------------------\n");
+   
+    current_token = yylex();
+    input[input_pos++] = current_token;
+   
+    while (top >= 0) {
+        displayStack();
+        printf("\t\t");
+        displayInput();
+        printf("\t\t");
+       
+        char X = stack[top];
+        char a = input[input_pos-1];
+       
+        if (X == a && X == '$') {
+            printf("Accept\n");
+            printf("\nInput string is valid!\n");
+            return;
+        }
+        else if (X == a) {
+            printf("Match %c\n", X);
+            pop();
+            advance();
+        }
+        else if (X == 'S' || X == 'A' || X == 'B') {
+            int production = getTableIndex(X, a);
+            switch(production) {
+                case 0:  // S → AB
+                    printf("S → AB\n");
+                    pop();
+                    push('B');
+                    push('A');
+                    break;
+                case 1:  // A → aA
+                    printf("A → aA\n");
+                    pop();
+                    push('A');
+                    push('a');
+                    break;
+                case 2:  // A → ε
+                    printf("A → ε\n");
+                    pop();
+                    break;
+                case 3:  // B → b
+                    printf("B → b\n");
+                    pop();
+                    push('b');
+                    break;
+                case -1:
+                    error();
+                    return;
+            }
+        }
+        else {
+            error();
+            return;
+        }
+    }
+}
+
+void error() {
+    printf("Error\n");
+    printf("\nInput string is invalid!\n");
+}
 
 int main() {
-    printf("Enter the input string (use 'a', 'b', and '$' to end): ");
-    char input_str[100];
-    fgets(input_str, 100, stdin);
-    input_str[strcspn(input_str, "\n")] = '\0';
-
-    // Initialize sets
-    for (int i = 0; i < NT_COUNT; i++) {
-        first[i].size = 0;
-        first[i].set[0] = '\0';
-        follow[i].size = 0;
-        follow[i].set[0] = '\0';
-    }
-
-    compute_first();
-    compute_follow();
-    build_parse_table();
-
-    display_sets();
-    display_parse_table();
-
-    ll1_parse(input_str);
-
+    displayFirstFollow();
+    constructParsingTable();
+    displayParsingTable();
+   
+    printf("\nEnter the input string (end with $): ");
+    parse();
+   
     return 0;
 }
 
-void yyerror(char* s) {
-    printf("Error: %s\n", s);
-    exit(1);
+void yyerror(char *s) {
+    fprintf(stderr, "Error: %s\n", s);
 }
