@@ -1,66 +1,138 @@
 %{
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-
-extern int yylex();
-extern int yyparse();
-extern FILE* yyin;
+#include <stdlib.h>
 
 void yyerror(const char *s);
+int yylex();
 
-char generated_query[1000];
+/* Global variables for SQL generation */
+char *fields[10];
+int field_count = 0;
+char *table = NULL;
+char *condition_field = NULL;
+char *condition_op = NULL;
+int condition_value = 0;
+char *update_field = NULL;
+int update_value = 0;
+int is_update = 0;
 %}
 
 %union {
     int num;
-    char* str;
+    char *str;
 }
 
-%token PLEASE GIVE SHOW ME ALL INFORMATION OF THE STUDENTS
-%token NAME ROLL CPI WHO HAVING UPDATE TO IS MORE LESS THAN
+%token REQUEST GIVE SHOW UPDATE ME THE ALL INFORMATION 
+%token ROLLNUMBERS ROLLNUMBER NAME CPI STUDENTS STUDENT
+%token WHOSE HAVING WITH IS ARE MORETHAN LESSTHAN EQUALTO NO AND OF
 %token <num> NUMBER
-%token <str> COMPARATOR
-
-%type <str> query
+%type <str> field op comparison query_spec condition
+%type <num> value
 
 %%
 
-input: 
-    query { 
-        printf("Generated SQL Query: %s\n", $1); 
-        strcpy(generated_query, $1);
+start: request query_type query_spec condition { 
+        if (is_update) {
+            printf("update Student set %s=%d where %s %s %d;\n", 
+                   update_field, update_value, 
+                   condition_field, condition_op, condition_value);
+        } else {
+            printf("select ");
+            if (field_count == 0 || strcmp(fields[0], "all the information") == 0) {
+                printf("*");
+            } else {
+                for (int i = 0; i < field_count; i++) {
+                    if (strcmp(fields[i], "roll numbers") == 0) {
+                        printf("roll");
+                    } else if (strcmp(fields[i], "roll number") == 0) {
+                        printf("roll");
+                    } else {
+                        printf("%s", fields[i]);
+                    }
+                    if (i < field_count - 1) printf(", ");
+                }
+            }
+            printf(" from Student");
+            if (condition_field != NULL) {
+                printf(" where %s %s %d", condition_field, condition_op, condition_value);
+            }
+            printf(";\n");
+        }
     }
-;
+    ;
 
-query: 
-    PLEASE GIVE ME ALL INFORMATION OF THE STUDENTS {
-        $$ = strdup("SELECT * FROM Student;");
+request: REQUEST { }
+    ;
+
+query_type: action
+    | ME item_list { }
+    | THE field OF target { }
+    ;
+
+action: GIVE { }
+    | SHOW { }
+    | UPDATE { is_update = 1; }
+    ;
+
+item_list: ALL THE INFORMATION { 
+        fields[0] = "all the information"; 
+        field_count = 1; 
     }
-    | PLEASE GIVE ME THE NAME OF THE STUDENTS {
-        $$ = strdup("SELECT name FROM Student;");
+    | field_list { }
+    ;
+
+field_list: field { 
+        fields[field_count++] = $1; 
     }
-    | PLEASE GIVE ME THE ROLL OF THE STUDENTS {
-        $$ = strdup("SELECT roll FROM Student;");
+    | field AND field_list { 
+        fields[field_count++] = $1; 
     }
-    | PLEASE SHOW NAME ROLL OF THE STUDENTS {
-        $$ = strdup("SELECT name, roll FROM Student;");
+    ;
+
+field: ROLLNUMBERS { $$ = "roll numbers"; }
+    | ROLLNUMBER { $$ = "roll number"; }
+    | NAME { $$ = "name"; }
+    | CPI { $$ = "cpi"; }
+    | INFORMATION { $$ = "information"; }
+    ;
+
+target: THE STUDENTS { table = "Student"; }
+    | THE STUDENT { table = "Student"; }
+    ;
+
+query_spec: WHOSE field comparison value { 
+        condition_field = $2; 
+        condition_op = $3; 
+        condition_value = $4; 
     }
-    | PLEASE GIVE ME NAME ROLL OF THE STUDENTS WHO HAVING CPI COMPARATOR NUMBER {
-        char query[200];
-        snprintf(query, sizeof(query), 
-            "SELECT name, roll FROM Student WHERE cpi %s %d;", 
-            $9, $10);
-        $$ = strdup(query);
+    | /* empty */ { $$ = NULL; }
+    ;
+
+condition: HAVING field NO value { 
+        condition_field = $2; 
+        condition_op = "="; 
+        condition_value = $4; 
     }
-    | PLEASE UPDATE THE CPI OF THE STUDENTS HAVING ROLL IS NUMBER TO NUMBER {
-        char query[200];
-        snprintf(query, sizeof(query), 
-            "UPDATE Student SET cpi = %d WHERE roll = %d;", 
-            $11, $8);
-        $$ = strdup(query);
+    | WITH field comparison value { 
+        condition_field = $2; 
+        condition_op = $3; 
+        condition_value = $4; 
     }
-;
+    | /* empty */ { $$ = NULL; }
+    ;
+
+comparison: IS op { $$ = $2; }
+    | ARE op { $$ = $2; }
+    ;
+
+op: MORETHAN { $$ = ">"; }
+    | LESSTHAN { $$ = "<"; }
+    | EQUALTO { $$ = "="; }
+    ;
+
+value: NUMBER { $$ = $1; }
+    ;
 
 %%
 
@@ -68,34 +140,8 @@ void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
 
-int main(int argc, char **argv) {
-    char input[1000];
-
-    printf("Natural Language to SQL Query Converter\n");
-    printf("Enter your query (or 'quit' to exit):\n");
-
-    while (1) {
-        printf("> ");
-        if (fgets(input, sizeof(input), stdin) == NULL) break;
-        
-        // Remove newline
-        input[strcspn(input, "\n")] = 0;
-        
-        // Check for quit
-        if (strcmp(input, "quit") == 0) break;
-
-        
-        yyin = fmemopen(input, strlen(input), "r");
-        
-        // Parse the query
-        if (yyparse() == 0) {
-            printf("Query successfully parsed.\n");
-        } else {
-            printf("Query parsing failed.\n");
-        }
-
-        fclose(yyin);
-    }
-
+int main() {
+    printf("Enter your English query (end with a newline):\n");
+    yyparse();
     return 0;
 }
