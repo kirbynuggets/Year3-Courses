@@ -493,13 +493,12 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "Q2.l"
-/* Lexer (flex) file - lexer.l */
-#line 3 "Q2.l"
+#line 2 "Q2.l"
 #include <string.h>
 #include <ctype.h>
 #include "y.tab.h"
+#line 501 "lex.yy.c"
 #line 502 "lex.yy.c"
-#line 503 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -716,9 +715,9 @@ YY_DECL
 		}
 
 	{
-#line 8 "Q2.l"
+#line 7 "Q2.l"
 
-#line 722 "lex.yy.c"
+#line 721 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -777,86 +776,86 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 9 "Q2.l"
+#line 8 "Q2.l"
 { return ARTICLE; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 10 "Q2.l"
+#line 9 "Q2.l"
 { yylval.str = strdup(yytext); return COMMON_NOUN; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 11 "Q2.l"
+#line 10 "Q2.l"
 { yylval.str = strdup("I"); return PRONOUN; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 12 "Q2.l"
+#line 11 "Q2.l"
 { yylval.str = strdup(yytext); return PRONOUN; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 13 "Q2.l"
+#line 12 "Q2.l"
 { yylval.str = strdup(yytext); return VERB; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 14 "Q2.l"
+#line 13 "Q2.l"
 { yylval.str = strdup(yytext); return VERB; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 15 "Q2.l"
+#line 14 "Q2.l"
 { yylval.str = strdup(yytext); return ADJECTIVE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 16 "Q2.l"
+#line 15 "Q2.l"
 { yylval.str = strdup(yytext); return IS; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 17 "Q2.l"
+#line 16 "Q2.l"
 { yylval.str = strdup(yytext); return AM; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 18 "Q2.l"
+#line 17 "Q2.l"
 { yylval.str = strdup(yytext); return ARE; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 19 "Q2.l"
+#line 18 "Q2.l"
 { yylval.str = strdup(yytext); return WAS; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 20 "Q2.l"
+#line 19 "Q2.l"
 { yylval.str = strdup(yytext); return WERE; }  
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 21 "Q2.l"
+#line 20 "Q2.l"
 { return PERIOD; }
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 22 "Q2.l"
+#line 21 "Q2.l"
 ;  /* Ignore whitespace and newlines */
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 23 "Q2.l"
+#line 22 "Q2.l"
 { printf("Invalid token: %s\n", yytext); return 0; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 24 "Q2.l"
+#line 23 "Q2.l"
 ECHO;
 	YY_BREAK
-#line 860 "lex.yy.c"
+#line 859 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1861,7 +1860,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 24 "Q2.l"
+#line 23 "Q2.l"
 
 
 int yywrap(){ 
