@@ -67,72 +67,21 @@
 
 
 /* First part of user prologue.  */
-#line 1 "Q1.y"
+#line 1 "Q2.y"
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 
-int flag = 0;
+int yylex();
+void yyerror(const char *s);
 
-void yyerror(const char *msg);
-int yyparse(void);
-
-
-struct node {
-    struct node* child1;
-    struct node* child2;
-    char op;             
-    const char *c_label;
-};
-
-void printAbstractTree(struct node *root, int indent) {
-    int i;
-    for (i = 0; i < indent; i++)
-        printf("  ");
-    if (root == NULL) {
-        printf("NULL\n");
-        return;
-    }
-    printf("Node: %c\n", root->op);
-    if (root->child1 || root->child2) {
-        for (i = 0; i < indent; i++)
-            printf("  ");
-        printf("Left:\n");
-        printAbstractTree(root->child1, indent + 1);
-        for (i = 0; i < indent; i++)
-            printf("  ");
-        printf("Right:\n");
-        printAbstractTree(root->child2, indent + 1);
-    }
-}
+int binaryToDecimal(char *binary);
+double binaryFractionToDecimal(char *binary);
 
 
-void printConcreteTree(struct node *root, int indent) {
-    int i;
-    for (i = 0; i < indent; i++)
-        printf("  ");
-    if (root == NULL) {
-        printf("NULL\n");
-        return;
-    }
-    printf("Production: %s\n", root->c_label);
-    if (root->child1 || root->child2) {
-        for (i = 0; i < indent; i++)
-            printf("  ");
-        printf("Left:\n");
-        printConcreteTree(root->child1, indent + 1);
-        for (i = 0; i < indent; i++)
-            printf("  ");
-        printf("Right:\n");
-        printConcreteTree(root->child2, indent + 1);
-    }
-}
-
-
-
-
-#line 136 "y.tab.c"
+#line 85 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -176,7 +125,9 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    id = 258                       /* id  */
+    BINARY_INT = 258,              /* BINARY_INT  */
+    BINARY_FLOAT = 259,            /* BINARY_FLOAT  */
+    EOL = 260                      /* EOL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -185,17 +136,19 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define id 258
+#define BINARY_INT 258
+#define BINARY_FLOAT 259
+#define EOL 260
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 66 "Q1.y"
+#line 15 "Q2.y"
 
-    struct node* tree;
+    char *str;
 
-#line 199 "y.tab.c"
+#line 152 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -218,14 +171,12 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_id = 3,                         /* id  */
-  YYSYMBOL_4_ = 4,                         /* '+'  */
-  YYSYMBOL_5_ = 5,                         /* '*'  */
+  YYSYMBOL_BINARY_INT = 3,                 /* BINARY_INT  */
+  YYSYMBOL_BINARY_FLOAT = 4,               /* BINARY_FLOAT  */
+  YYSYMBOL_EOL = 5,                        /* EOL  */
   YYSYMBOL_YYACCEPT = 6,                   /* $accept  */
   YYSYMBOL_input = 7,                      /* input  */
-  YYSYMBOL_expr = 8,                       /* expr  */
-  YYSYMBOL_term = 9,                       /* term  */
-  YYSYMBOL_factor = 10                     /* factor  */
+  YYSYMBOL_binary = 8                      /* binary  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -551,21 +502,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  6
+#define YYFINAL  7
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   8
+#define YYLAST   5
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  6
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  3
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  7
+#define YYNRULES  5
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  11
+#define YYNSTATES  9
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   258
+#define YYMAXUTOK   260
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -583,7 +534,6 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     5,     4,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -604,14 +554,16 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
+       5
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int8 yyrline[] =
 {
-       0,    77,    77,    90,    99,   110,   119,   130
+       0,    24,    24,    28,    34,    41
 };
 #endif
 
@@ -627,8 +579,8 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "id", "'+'", "'*'",
-  "$accept", "input", "expr", "term", "factor", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "BINARY_INT",
+  "BINARY_FLOAT", "EOL", "$accept", "input", "binary", YY_NULLPTR
 };
 
 static const char *
@@ -652,8 +604,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -5,     1,    -2,    -1,    -5,    -5,    -3,    -3,    -1,
-      -5
+      -1,    -4,    -5,    -5,     4,     0,    -5,    -5,    -5
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -661,20 +612,19 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     7,     0,     2,     4,     6,     1,     0,     0,     3,
-       5
+       0,     0,     4,     5,     0,     0,     3,     1,     2
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -5,    -5,    -5,    -4,     0
+      -5,    -5,    -5
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     4,     5
+       0,     4,     5
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -682,32 +632,31 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     6,     7,     9,     8,     0,     0,     0,    10
+       1,     6,     2,     3,     7,     8
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     4,     7,     5,    -1,    -1,    -1,     8
+       1,     5,     3,     4,     0,     5
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     7,     8,     9,    10,     0,     4,     5,     9,
-      10
+       0,     1,     3,     4,     7,     8,     5,     0,     5
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,     6,     7,     8,     8,     9,     9,    10
+       0,     6,     7,     7,     8,     8
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     3,     1,     3,     1,     1
+       0,     2,     2,     2,     1,     1
 };
 
 
@@ -1170,93 +1119,53 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* input: expr  */
-#line 77 "Q1.y"
-            { 
-           if (!flag) {
-               printf("Valid\n");
-               printf("\n--- Abstract Tree ---\n");
-               printAbstractTree((yyvsp[0].tree), 0);
-               printf("\n--- Concrete Tree ---\n");
-               printConcreteTree((yyvsp[0].tree), 0);
-           }
-           return 0;
-       }
-#line 1186 "y.tab.c"
+  case 2: /* input: binary EOL  */
+#line 24 "Q2.y"
+               {
+        printf("Conversion successful!\n");
+    }
+#line 1128 "y.tab.c"
     break;
 
-  case 3: /* expr: expr '+' term  */
-#line 90 "Q1.y"
-                    {
-           (yyval.tree) = malloc(sizeof(struct node));
-           if (!(yyval.tree)) { yyerror("Memory allocation error"); exit(1); }
-           (yyval.tree)->op = '+'; 
-           (yyval.tree)->child1 = (yyvsp[-2].tree);
-           (yyval.tree)->child2 = (yyvsp[0].tree);
-           (yyval.tree)->c_label = "E -> E + T";
-           printf("Reduced Using Rule: E -> E + T\n");
-       }
-#line 1200 "y.tab.c"
+  case 3: /* input: error EOL  */
+#line 28 "Q2.y"
+              {
+        yyerror("Invalid binary number!");
+    }
+#line 1136 "y.tab.c"
     break;
 
-  case 4: /* expr: term  */
-#line 99 "Q1.y"
-           {
-           (yyval.tree) = malloc(sizeof(struct node));
-           if (!(yyval.tree)) { yyerror("Memory allocation error"); exit(1); }
-           (yyval.tree)->op = (yyvsp[0].tree)->op; 
-           (yyval.tree)->child1 = (yyvsp[0].tree);
-           (yyval.tree)->child2 = NULL;
-           (yyval.tree)->c_label = "E -> T";
-           printf("Reduced Using Rule: E -> T\n");
-       }
-#line 1214 "y.tab.c"
+  case 4: /* binary: BINARY_INT  */
+#line 34 "Q2.y"
+               {
+        printf("SDT: Converting binary integer %s to decimal.\n", (yyvsp[0].str));
+        int result = binaryToDecimal((yyvsp[0].str));
+        printf("Result: %d (decimal)\n", result);
+        free((yyvsp[0].str));  // Free the allocated memory
+    }
+#line 1147 "y.tab.c"
     break;
 
-  case 5: /* term: term '*' factor  */
-#line 110 "Q1.y"
-                      {
-           (yyval.tree) = malloc(sizeof(struct node));
-           if (!(yyval.tree)) { yyerror("Memory allocation error"); exit(1); }
-           (yyval.tree)->op = '*';
-           (yyval.tree)->child1 = (yyvsp[-2].tree);
-           (yyval.tree)->child2 = (yyvsp[0].tree);
-           (yyval.tree)->c_label = "T -> T * F";
-           printf("Reduced Using Rule: T -> T * F\n");
-       }
-#line 1228 "y.tab.c"
-    break;
-
-  case 6: /* term: factor  */
-#line 119 "Q1.y"
-             {
-           (yyval.tree) = malloc(sizeof(struct node));
-           if (!(yyval.tree)) { yyerror("Memory allocation error"); exit(1); }
-           (yyval.tree)->op = (yyvsp[0].tree)->op;
-           (yyval.tree)->child1 = (yyvsp[0].tree);
-           (yyval.tree)->child2 = NULL;
-           (yyval.tree)->c_label = "T -> F";
-           printf("Reduced Using Rule: T -> F\n");
-       }
-#line 1242 "y.tab.c"
-    break;
-
-  case 7: /* factor: id  */
-#line 130 "Q1.y"
-           {
-           (yyval.tree) = malloc(sizeof(struct node));
-           if (!(yyval.tree)) { yyerror("Memory allocation error"); exit(1); }
-           (yyval.tree)->child1 = NULL;
-           (yyval.tree)->child2 = NULL;
-           (yyval.tree)->op = 'i';
-           (yyval.tree)->c_label = "F -> id";
-           printf("Reduced Using Rule: F -> id\n");
-       }
-#line 1256 "y.tab.c"
+  case 5: /* binary: BINARY_FLOAT  */
+#line 41 "Q2.y"
+                 {
+        printf("SDT: Converting binary floating-point %s to decimal.\n", (yyvsp[0].str));
+        
+        char *dot = strchr((yyvsp[0].str), '.');
+        *dot = '\0'; // Split integer and fractional parts
+        
+        int intPart = binaryToDecimal((yyvsp[0].str));
+        double fracPart = binaryFractionToDecimal(dot + 1);
+        
+        double result = intPart + fracPart;
+        printf("Result: %.6f (decimal)\n", result);
+        free((yyvsp[0].str));  // Free the allocated memory
+    }
+#line 1165 "y.tab.c"
     break;
 
 
-#line 1260 "y.tab.c"
+#line 1169 "y.tab.c"
 
       default: break;
     }
@@ -1449,19 +1358,37 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 140 "Q1.y"
+#line 56 "Q2.y"
 
 
-void yyerror(const char *msg) {
-    fprintf(stderr, "Error: %s\n", msg);
-    flag = 1;
+int binaryToDecimal(char *binary) {
+    int decimal = 0, len = strlen(binary);
+    for (int i = 0; i < len; i++) {
+        if (binary[i] == '1') {
+            decimal += pow(2, len - 1 - i);
+        }
+    }
+    return decimal;
+}
+
+double binaryFractionToDecimal(char *binary) {
+    double decimal = 0.0;
+    int len = strlen(binary);
+    for (int i = 0; i < len; i++) {
+        if (binary[i] == '1') {
+            decimal += pow(2, -(i + 1));
+        }
+    }
+    return decimal;
+}
+
+void yyerror(const char *s) {
+    fprintf(stderr, "Error: %s\n", s);
 }
 
 int main() {
-    printf("Enter an arithmetic expression: ");
+    printf("Binary to Decimal Converter\n");
+    printf("Enter a binary number (e.g., 101 or 101.11): ");
     yyparse();
-    if (flag) {
-        printf("Invalid\n");
-    }
     return 0;
 }
