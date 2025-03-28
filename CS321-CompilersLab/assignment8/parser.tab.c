@@ -67,27 +67,17 @@
 
 
 /* First part of user prologue.  */
-#line 1 "Q.y"
+#line 1 "parser.y"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 void yyerror(const char *s);
-int yylex();
+int yylex(void);
+void yy_scan_string(const char *str);
 
-/* Global variables for SQL generation */
-char *fields[10];
-int field_count = 0;
-char *table = NULL;
-char *condition_field = NULL;
-char *condition_op = NULL;
-int condition_value = 0;
-char *update_field = NULL;
-int update_value = 0;
-int is_update = 0;
-
-#line 91 "y.tab.c"
+#line 81 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -110,113 +100,7 @@ int is_update = 0;
 #  endif
 # endif
 
-/* Use api.header.include to #include this header
-   instead of duplicating it here.  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token kinds.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    REQUEST = 258,                 /* REQUEST  */
-    GIVE = 259,                    /* GIVE  */
-    SHOW = 260,                    /* SHOW  */
-    UPDATE = 261,                  /* UPDATE  */
-    ME = 262,                      /* ME  */
-    THE = 263,                     /* THE  */
-    ALL = 264,                     /* ALL  */
-    INFORMATION = 265,             /* INFORMATION  */
-    ROLLNUMBERS = 266,             /* ROLLNUMBERS  */
-    ROLLNUMBER = 267,              /* ROLLNUMBER  */
-    NAME = 268,                    /* NAME  */
-    CPI = 269,                     /* CPI  */
-    STUDENTS = 270,                /* STUDENTS  */
-    STUDENT = 271,                 /* STUDENT  */
-    WHOSE = 272,                   /* WHOSE  */
-    HAVING = 273,                  /* HAVING  */
-    WITH = 274,                    /* WITH  */
-    IS = 275,                      /* IS  */
-    ARE = 276,                     /* ARE  */
-    MORETHAN = 277,                /* MORETHAN  */
-    LESSTHAN = 278,                /* LESSTHAN  */
-    EQUALTO = 279,                 /* EQUALTO  */
-    NO = 280,                      /* NO  */
-    AND = 281,                     /* AND  */
-    OF = 282,                      /* OF  */
-    NUMBER = 283                   /* NUMBER  */
-  };
-  typedef enum yytokentype yytoken_kind_t;
-#endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define REQUEST 258
-#define GIVE 259
-#define SHOW 260
-#define UPDATE 261
-#define ME 262
-#define THE 263
-#define ALL 264
-#define INFORMATION 265
-#define ROLLNUMBERS 266
-#define ROLLNUMBER 267
-#define NAME 268
-#define CPI 269
-#define STUDENTS 270
-#define STUDENT 271
-#define WHOSE 272
-#define HAVING 273
-#define WITH 274
-#define IS 275
-#define ARE 276
-#define MORETHAN 277
-#define LESSTHAN 278
-#define EQUALTO 279
-#define NO 280
-#define AND 281
-#define OF 282
-#define NUMBER 283
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 21 "Q.y"
-
-    int num;
-    char *str;
-
-#line 205 "y.tab.c"
-
-};
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-extern YYSTYPE yylval;
-
-
-int yyparse (void);
-
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#include "parser.tab.h"
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -224,46 +108,40 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_REQUEST = 3,                    /* REQUEST  */
-  YYSYMBOL_GIVE = 4,                       /* GIVE  */
-  YYSYMBOL_SHOW = 5,                       /* SHOW  */
-  YYSYMBOL_UPDATE = 6,                     /* UPDATE  */
-  YYSYMBOL_ME = 7,                         /* ME  */
-  YYSYMBOL_THE = 8,                        /* THE  */
-  YYSYMBOL_ALL = 9,                        /* ALL  */
-  YYSYMBOL_INFORMATION = 10,               /* INFORMATION  */
-  YYSYMBOL_ROLLNUMBERS = 11,               /* ROLLNUMBERS  */
-  YYSYMBOL_ROLLNUMBER = 12,                /* ROLLNUMBER  */
-  YYSYMBOL_NAME = 13,                      /* NAME  */
-  YYSYMBOL_CPI = 14,                       /* CPI  */
-  YYSYMBOL_STUDENTS = 15,                  /* STUDENTS  */
-  YYSYMBOL_STUDENT = 16,                   /* STUDENT  */
-  YYSYMBOL_WHOSE = 17,                     /* WHOSE  */
-  YYSYMBOL_HAVING = 18,                    /* HAVING  */
-  YYSYMBOL_WITH = 19,                      /* WITH  */
-  YYSYMBOL_IS = 20,                        /* IS  */
-  YYSYMBOL_ARE = 21,                       /* ARE  */
-  YYSYMBOL_MORETHAN = 22,                  /* MORETHAN  */
-  YYSYMBOL_LESSTHAN = 23,                  /* LESSTHAN  */
-  YYSYMBOL_EQUALTO = 24,                   /* EQUALTO  */
-  YYSYMBOL_NO = 25,                        /* NO  */
-  YYSYMBOL_AND = 26,                       /* AND  */
-  YYSYMBOL_OF = 27,                        /* OF  */
-  YYSYMBOL_NUMBER = 28,                    /* NUMBER  */
+  YYSYMBOL_KINDLY = 3,                     /* KINDLY  */
+  YYSYMBOL_FETCH = 4,                      /* FETCH  */
+  YYSYMBOL_DISPLAY = 5,                    /* DISPLAY  */
+  YYSYMBOL_EVERY = 6,                      /* EVERY  */
+  YYSYMBOL_DETAILS = 7,                    /* DETAILS  */
+  YYSYMBOL_FOR = 8,                        /* FOR  */
+  YYSYMBOL_STUDENTS = 9,                   /* STUDENTS  */
+  YYSYMBOL_LIST = 10,                      /* LIST  */
+  YYSYMBOL_WITH = 11,                      /* WITH  */
+  YYSYMBOL_VALUE = 12,                     /* VALUE  */
+  YYSYMBOL_HIGHER = 13,                    /* HIGHER  */
+  YYSYMBOL_THAN = 14,                      /* THAN  */
+  YYSYMBOL_LOWER = 15,                     /* LOWER  */
+  YYSYMBOL_SAME = 16,                      /* SAME  */
+  YYSYMBOL_AS = 17,                        /* AS  */
+  YYSYMBOL_MODIFY = 18,                    /* MODIFY  */
+  YYSYMBOL_CHANGE = 19,                    /* CHANGE  */
+  YYSYMBOL_TO = 20,                        /* TO  */
+  YYSYMBOL_CALLED = 21,                    /* CALLED  */
+  YYSYMBOL_ROLL = 22,                      /* ROLL  */
+  YYSYMBOL_CPI = 23,                       /* CPI  */
+  YYSYMBOL_NAMES = 24,                     /* NAMES  */
+  YYSYMBOL_ROLLS = 25,                     /* ROLLS  */
+  YYSYMBOL_CPIS = 26,                      /* CPIS  */
+  YYSYMBOL_AND = 27,                       /* AND  */
+  YYSYMBOL_NUMBERVAL = 28,                 /* NUMBERVAL  */
   YYSYMBOL_YYACCEPT = 29,                  /* $accept  */
   YYSYMBOL_start = 30,                     /* start  */
-  YYSYMBOL_request = 31,                   /* request  */
-  YYSYMBOL_query_type = 32,                /* query_type  */
-  YYSYMBOL_action = 33,                    /* action  */
-  YYSYMBOL_item_list = 34,                 /* item_list  */
-  YYSYMBOL_field_list = 35,                /* field_list  */
-  YYSYMBOL_field = 36,                     /* field  */
-  YYSYMBOL_target = 37,                    /* target  */
-  YYSYMBOL_query_spec = 38,                /* query_spec  */
-  YYSYMBOL_condition = 39,                 /* condition  */
-  YYSYMBOL_comparison = 40,                /* comparison  */
-  YYSYMBOL_op = 41,                        /* op  */
-  YYSYMBOL_value = 42                      /* value  */
+  YYSYMBOL_select_stmt = 31,               /* select_stmt  */
+  YYSYMBOL_update_stmt = 32,               /* update_stmt  */
+  YYSYMBOL_attr_list = 33,                 /* attr_list  */
+  YYSYMBOL_attr = 34,                      /* attr  */
+  YYSYMBOL_condition = 35,                 /* condition  */
+  YYSYMBOL_comp = 36                       /* comp  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -589,18 +467,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  4
+#define YYFINAL  17
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   49
+#define YYLAST   58
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  29
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  14
+#define YYNNTS  8
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  31
+#define YYNRULES  18
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  53
+#define YYNSTATES  54
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   283
@@ -650,12 +528,10 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int8 yyrline[] =
 {
-       0,    35,    35,    65,    68,    69,    70,    73,    74,    75,
-      78,    82,    85,    88,    93,    94,    95,    96,    97,   100,
-     101,   104,   109,   112,   117,   122,   125,   126,   129,   130,
-     131,   134
+       0,    23,    23,    26,    31,    35,    39,    43,    49,    53,
+      59,    60,    66,    67,    68,    71,    77,    78,    79
 };
 #endif
 
@@ -671,13 +547,12 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "REQUEST", "GIVE",
-  "SHOW", "UPDATE", "ME", "THE", "ALL", "INFORMATION", "ROLLNUMBERS",
-  "ROLLNUMBER", "NAME", "CPI", "STUDENTS", "STUDENT", "WHOSE", "HAVING",
-  "WITH", "IS", "ARE", "MORETHAN", "LESSTHAN", "EQUALTO", "NO", "AND",
-  "OF", "NUMBER", "$accept", "start", "request", "query_type", "action",
-  "item_list", "field_list", "field", "target", "query_spec", "condition",
-  "comparison", "op", "value", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "KINDLY", "FETCH",
+  "DISPLAY", "EVERY", "DETAILS", "FOR", "STUDENTS", "LIST", "WITH",
+  "VALUE", "HIGHER", "THAN", "LOWER", "SAME", "AS", "MODIFY", "CHANGE",
+  "TO", "CALLED", "ROLL", "CPI", "NAMES", "ROLLS", "CPIS", "AND",
+  "NUMBERVAL", "$accept", "start", "select_stmt", "update_stmt",
+  "attr_list", "attr", "condition", "comp", YY_NULLPTR
 };
 
 static const char *
@@ -687,7 +562,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-19)
+#define YYPACT_NINF (-20)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -701,12 +576,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       9,   -19,    26,     3,   -19,   -19,   -19,   -19,    -8,     4,
-      16,   -19,    27,   -19,   -19,   -19,   -19,   -19,   -19,   -19,
-       8,    10,     4,     6,    28,     4,    31,     7,     4,     4,
-     -19,   -19,   -19,    14,   -19,    -1,    -1,    12,    11,     7,
-     -19,   -19,   -19,   -19,   -19,   -19,   -19,   -19,   -19,    12,
-      12,   -19,   -19
+      -1,     3,   -14,   -19,    -9,    13,   -20,   -20,   -14,     9,
+     -20,   -20,   -20,    -8,   -20,     8,     1,   -20,    -7,    15,
+      14,   -14,    16,    -4,    17,    19,    18,   -20,     7,    22,
+     -20,    23,    10,     6,    26,   -20,    24,   -20,    11,    27,
+     -10,    12,    20,    25,    29,    28,    21,   -20,    30,   -20,
+     -20,   -20,   -20,   -20
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -714,26 +589,24 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     3,     0,     0,     1,     7,     8,     9,     0,     0,
-      22,     4,     0,    18,    14,    15,    16,    17,     5,    11,
-      12,     0,     0,    25,     0,     0,     0,     0,     0,     0,
-       2,    10,    13,     0,     6,     0,     0,     0,     0,     0,
-      19,    20,    28,    29,    30,    26,    27,    31,    21,     0,
-       0,    23,    24
+       0,     0,     0,     0,     0,     0,     2,     3,     0,     0,
+      12,    13,    14,     0,    10,     0,     0,     1,     0,     0,
+       0,     0,     0,     0,     0,     0,     6,    11,     0,     0,
+       4,     0,     0,     0,     0,     5,     0,     7,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     8,     0,    16,
+      17,    18,    15,     9
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -19,   -19,   -19,   -19,   -19,   -19,    17,    -9,   -19,   -19,
-     -19,     2,    13,   -18
+     -20,   -20,   -20,   -20,    33,    31,   -20,   -20
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,    10,    11,    18,    19,    20,    34,    23,
-      30,    37,    45,    48
+       0,     5,     6,     7,    13,    14,    37,    46
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -741,50 +614,48 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      21,    12,    13,    14,    15,    16,    17,     5,     6,     7,
-       8,     9,     1,    27,    13,    14,    15,    16,    17,    38,
-      39,    42,    43,    44,    28,    29,     4,    35,    36,    40,
-      41,    51,    52,    22,    25,    24,    49,    26,    31,    33,
-      47,    50,    32,     0,     0,     0,     0,     0,     0,    46
+      20,    24,     1,    43,    15,    44,    45,     8,     9,     2,
+      10,    11,    12,    17,    16,    19,    22,     3,     4,    21,
+      21,    23,    25,    26,    29,    28,    30,    31,    33,    32,
+      34,    41,    35,    36,    38,    39,    40,     0,    42,    49,
+      47,    18,    48,    50,     0,    51,     0,     0,     0,    52,
+       0,     0,    27,     0,     0,     0,     0,     0,    53
 };
 
 static const yytype_int8 yycheck[] =
 {
-       9,     9,    10,    11,    12,    13,    14,     4,     5,     6,
-       7,     8,     3,    22,    10,    11,    12,    13,    14,    28,
-      29,    22,    23,    24,    18,    19,     0,    20,    21,    15,
-      16,    49,    50,    17,    26,     8,    25,    27,    10,     8,
-      28,    39,    25,    -1,    -1,    -1,    -1,    -1,    -1,    36
+       8,     8,     3,    13,    23,    15,    16,     4,     5,    10,
+      24,    25,    26,     0,    23,     6,     8,    18,    19,    27,
+      27,    20,     7,     9,    28,     9,     9,     8,    21,    11,
+       8,    20,     9,    23,    28,     9,    12,    -1,    11,    14,
+      28,     8,    22,    14,    -1,    17,    -1,    -1,    -1,    28,
+      -1,    -1,    21,    -1,    -1,    -1,    -1,    -1,    28
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    30,    31,     0,     4,     5,     6,     7,     8,
-      32,    33,     9,    10,    11,    12,    13,    14,    34,    35,
-      36,    36,    17,    38,     8,    26,    27,    36,    18,    19,
-      39,    10,    35,     8,    37,    20,    21,    40,    36,    36,
-      15,    16,    22,    23,    24,    41,    41,    28,    42,    25,
-      40,    42,    42
+       0,     3,    10,    18,    19,    30,    31,    32,     4,     5,
+      24,    25,    26,    33,    34,    23,    23,     0,    33,     6,
+       8,    27,     8,    20,     8,     7,     9,    34,     9,    28,
+       9,     8,    11,    21,     8,     9,    23,    35,    28,     9,
+      12,    20,    11,    13,    15,    16,    36,    28,    22,    14,
+      14,    17,    28,    28
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    29,    30,    31,    32,    32,    32,    33,    33,    33,
-      34,    34,    35,    35,    36,    36,    36,    36,    36,    37,
-      37,    38,    38,    39,    39,    39,    40,    40,    41,    41,
-      41,    42
+       0,    29,    30,    30,    31,    31,    31,    31,    32,    32,
+      33,    33,    34,    34,    34,    35,    36,    36,    36
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     4,     1,     1,     2,     4,     1,     1,     1,
-       3,     1,     1,     3,     1,     1,     1,     1,     1,     2,
-       2,     4,     0,     4,     4,     0,     2,     2,     1,     1,
-       1,     1
+       0,     2,     1,     1,     5,     6,     4,     6,     8,     9,
+       1,     3,     1,     1,     1,     4,     2,     2,     2
 };
 
 
@@ -1247,228 +1118,130 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* start: request query_type query_spec condition  */
-#line 35 "Q.y"
-                                               { 
-        if (is_update) {
-            printf("update Student set %s=%d where %s %s %d;\n", 
-                   update_field, update_value, 
-                   condition_field, condition_op, condition_value);
-        } else {
-            printf("select ");
-            if (field_count == 0 || strcmp(fields[0], "all the information") == 0) {
-                printf("*");
-            } else {
-                for (int i = 0; i < field_count; i++) {
-                    if (strcmp(fields[i], "roll numbers") == 0) {
-                        printf("roll");
-                    } else if (strcmp(fields[i], "roll number") == 0) {
-                        printf("roll");
-                    } else {
-                        printf("%s", fields[i]);
-                    }
-                    if (i < field_count - 1) printf(", ");
-                }
-            }
-            printf(" from Student");
-            if (condition_field != NULL) {
-                printf(" where %s %s %d", condition_field, condition_op, condition_value);
-            }
-            printf(";\n");
+  case 2: /* start: select_stmt  */
+#line 23 "parser.y"
+                   { 
+            printf("SQL query: %s\n", (yyvsp[0].str)); 
         }
-    }
-#line 1281 "y.tab.c"
+#line 1127 "parser.tab.c"
     break;
 
-  case 3: /* request: REQUEST  */
-#line 65 "Q.y"
-                 { }
-#line 1287 "y.tab.c"
+  case 3: /* start: update_stmt  */
+#line 26 "parser.y"
+                   { 
+            printf("SQL query: %s\n", (yyvsp[0].str)); 
+        }
+#line 1135 "parser.tab.c"
     break;
 
-  case 5: /* query_type: ME item_list  */
-#line 69 "Q.y"
-                   { }
-#line 1293 "y.tab.c"
+  case 4: /* select_stmt: KINDLY FETCH attr_list FOR STUDENTS  */
+#line 32 "parser.y"
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select %s from Student", (yyvsp[-2].str)); 
+             (yyval.str) = tmp; }
+#line 1143 "parser.tab.c"
     break;
 
-  case 6: /* query_type: THE field OF target  */
-#line 70 "Q.y"
-                          { }
-#line 1299 "y.tab.c"
+  case 5: /* select_stmt: KINDLY DISPLAY EVERY DETAILS FOR STUDENTS  */
+#line 36 "parser.y"
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select * from Student"); 
+             (yyval.str) = tmp; }
+#line 1151 "parser.tab.c"
     break;
 
-  case 7: /* action: GIVE  */
-#line 73 "Q.y"
-             { }
-#line 1305 "y.tab.c"
+  case 6: /* select_stmt: LIST attr_list FOR STUDENTS  */
+#line 40 "parser.y"
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select %s from Student", (yyvsp[-2].str)); 
+             (yyval.str) = tmp; }
+#line 1159 "parser.tab.c"
     break;
 
-  case 8: /* action: SHOW  */
-#line 74 "Q.y"
-           { }
-#line 1311 "y.tab.c"
+  case 7: /* select_stmt: LIST attr_list FOR STUDENTS WITH condition  */
+#line 44 "parser.y"
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select %s from Student where %s", (yyvsp[-4].str), (yyvsp[0].str)); 
+             (yyval.str) = tmp; }
+#line 1167 "parser.tab.c"
     break;
 
-  case 9: /* action: UPDATE  */
-#line 75 "Q.y"
-             { is_update = 1; }
-#line 1317 "y.tab.c"
+  case 8: /* update_stmt: MODIFY CPI FOR STUDENTS CALLED NUMBERVAL TO NUMBERVAL  */
+#line 50 "parser.y"
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "update Student set cpi=%f where roll=%f", (yyvsp[0].num), (yyvsp[-2].num)); 
+             (yyval.str) = tmp; }
+#line 1175 "parser.tab.c"
     break;
 
-  case 10: /* item_list: ALL THE INFORMATION  */
-#line 78 "Q.y"
-                               { 
-        fields[0] = "all the information"; 
-        field_count = 1; 
-    }
-#line 1326 "y.tab.c"
+  case 9: /* update_stmt: CHANGE CPI TO NUMBERVAL FOR STUDENTS WITH ROLL NUMBERVAL  */
+#line 54 "parser.y"
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "update Student set cpi=%f where roll=%f", (yyvsp[-5].num), (yyvsp[0].num)); 
+             (yyval.str) = tmp; }
+#line 1183 "parser.tab.c"
     break;
 
-  case 11: /* item_list: field_list  */
-#line 82 "Q.y"
-                 { }
-#line 1332 "y.tab.c"
+  case 10: /* attr_list: attr  */
+#line 59 "parser.y"
+                { (yyval.str) = (yyvsp[0].str); }
+#line 1189 "parser.tab.c"
     break;
 
-  case 12: /* field_list: field  */
-#line 85 "Q.y"
-                  { 
-        fields[field_count++] = (yyvsp[0].str); 
-    }
-#line 1340 "y.tab.c"
+  case 11: /* attr_list: attr_list AND attr  */
+#line 61 "parser.y"
+         { char *tmp = malloc(100); 
+           sprintf(tmp, "%s, %s", (yyvsp[-2].str), (yyvsp[0].str)); 
+           (yyval.str) = tmp; }
+#line 1197 "parser.tab.c"
     break;
 
-  case 13: /* field_list: field AND field_list  */
-#line 88 "Q.y"
-                           { 
-        fields[field_count++] = (yyvsp[-2].str); 
-    }
-#line 1348 "y.tab.c"
+  case 12: /* attr: NAMES  */
+#line 66 "parser.y"
+            { (yyval.str) = "name"; }
+#line 1203 "parser.tab.c"
     break;
 
-  case 14: /* field: ROLLNUMBERS  */
-#line 93 "Q.y"
-                   { (yyval.str) = "roll numbers"; }
-#line 1354 "y.tab.c"
+  case 13: /* attr: ROLLS  */
+#line 67 "parser.y"
+            { (yyval.str) = "roll"; }
+#line 1209 "parser.tab.c"
     break;
 
-  case 15: /* field: ROLLNUMBER  */
-#line 94 "Q.y"
-                 { (yyval.str) = "roll number"; }
-#line 1360 "y.tab.c"
+  case 14: /* attr: CPIS  */
+#line 68 "parser.y"
+           { (yyval.str) = "cpi"; }
+#line 1215 "parser.tab.c"
     break;
 
-  case 16: /* field: NAME  */
-#line 95 "Q.y"
-           { (yyval.str) = "name"; }
-#line 1366 "y.tab.c"
+  case 15: /* condition: CPI VALUE comp NUMBERVAL  */
+#line 72 "parser.y"
+         { char *tmp = malloc(100); 
+           sprintf(tmp, "cpi %s %f", (yyvsp[-1].str), (yyvsp[0].num)); 
+           (yyval.str) = tmp; }
+#line 1223 "parser.tab.c"
     break;
 
-  case 17: /* field: CPI  */
-#line 96 "Q.y"
-          { (yyval.str) = "cpi"; }
-#line 1372 "y.tab.c"
+  case 16: /* comp: HIGHER THAN  */
+#line 77 "parser.y"
+                  { (yyval.str) = ">"; }
+#line 1229 "parser.tab.c"
     break;
 
-  case 18: /* field: INFORMATION  */
-#line 97 "Q.y"
-                  { (yyval.str) = "information"; }
-#line 1378 "y.tab.c"
+  case 17: /* comp: LOWER THAN  */
+#line 78 "parser.y"
+                 { (yyval.str) = "<"; }
+#line 1235 "parser.tab.c"
     break;
 
-  case 19: /* target: THE STUDENTS  */
-#line 100 "Q.y"
-                     { table = "Student"; }
-#line 1384 "y.tab.c"
-    break;
-
-  case 20: /* target: THE STUDENT  */
-#line 101 "Q.y"
-                  { table = "Student"; }
-#line 1390 "y.tab.c"
-    break;
-
-  case 21: /* query_spec: WHOSE field comparison value  */
-#line 104 "Q.y"
-                                         { 
-        condition_field = (yyvsp[-2].str); 
-        condition_op = (yyvsp[-1].str); 
-        condition_value = (yyvsp[0].num); 
-    }
-#line 1400 "y.tab.c"
-    break;
-
-  case 22: /* query_spec: %empty  */
-#line 109 "Q.y"
-                  { (yyval.str) = NULL; }
-#line 1406 "y.tab.c"
-    break;
-
-  case 23: /* condition: HAVING field NO value  */
-#line 112 "Q.y"
-                                 { 
-        condition_field = (yyvsp[-2].str); 
-        condition_op = "="; 
-        condition_value = (yyvsp[0].num); 
-    }
-#line 1416 "y.tab.c"
-    break;
-
-  case 24: /* condition: WITH field comparison value  */
-#line 117 "Q.y"
-                                  { 
-        condition_field = (yyvsp[-2].str); 
-        condition_op = (yyvsp[-1].str); 
-        condition_value = (yyvsp[0].num); 
-    }
-#line 1426 "y.tab.c"
-    break;
-
-  case 25: /* condition: %empty  */
-#line 122 "Q.y"
-                  { (yyval.str) = NULL; }
-#line 1432 "y.tab.c"
-    break;
-
-  case 26: /* comparison: IS op  */
-#line 125 "Q.y"
-                  { (yyval.str) = (yyvsp[0].str); }
-#line 1438 "y.tab.c"
-    break;
-
-  case 27: /* comparison: ARE op  */
-#line 126 "Q.y"
-             { (yyval.str) = (yyvsp[0].str); }
-#line 1444 "y.tab.c"
-    break;
-
-  case 28: /* op: MORETHAN  */
-#line 129 "Q.y"
-             { (yyval.str) = ">"; }
-#line 1450 "y.tab.c"
-    break;
-
-  case 29: /* op: LESSTHAN  */
-#line 130 "Q.y"
-               { (yyval.str) = "<"; }
-#line 1456 "y.tab.c"
-    break;
-
-  case 30: /* op: EQUALTO  */
-#line 131 "Q.y"
+  case 18: /* comp: SAME AS  */
+#line 79 "parser.y"
               { (yyval.str) = "="; }
-#line 1462 "y.tab.c"
-    break;
-
-  case 31: /* value: NUMBER  */
-#line 134 "Q.y"
-              { (yyval.num) = (yyvsp[0].num); }
-#line 1468 "y.tab.c"
+#line 1241 "parser.tab.c"
     break;
 
 
-#line 1472 "y.tab.c"
+#line 1245 "parser.tab.c"
 
       default: break;
     }
@@ -1661,7 +1434,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 137 "Q.y"
+#line 82 "parser.y"
 
 
 void yyerror(const char *s) {
@@ -1669,7 +1442,17 @@ void yyerror(const char *s) {
 }
 
 int main() {
-    printf("Enter your English query (end with a newline):\n");
-    yyparse();
-    return 0;
+    char query[256];  
+    printf("Enter your query: ");
+    if (fgets(query, sizeof(query), stdin) == NULL) {
+        perror("Error reading query");
+        return 1;
+    }
+    
+    printf("User query: %s", query);
+
+    
+    yy_scan_string(query);  
+    int result = yyparse();
+    return result;
 }

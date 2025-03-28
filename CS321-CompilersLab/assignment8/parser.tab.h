@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_PARSER_TAB_H_INCLUDED
+# define YY_YY_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -54,77 +54,46 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    REQUEST = 258,                 /* REQUEST  */
-    GIVE = 259,                    /* GIVE  */
-    SHOW = 260,                    /* SHOW  */
-    UPDATE = 261,                  /* UPDATE  */
-    ME = 262,                      /* ME  */
-    THE = 263,                     /* THE  */
-    ALL = 264,                     /* ALL  */
-    INFORMATION = 265,             /* INFORMATION  */
-    ROLLNUMBERS = 266,             /* ROLLNUMBERS  */
-    ROLLNUMBER = 267,              /* ROLLNUMBER  */
-    NAME = 268,                    /* NAME  */
-    CPI = 269,                     /* CPI  */
-    STUDENTS = 270,                /* STUDENTS  */
-    STUDENT = 271,                 /* STUDENT  */
-    WHOSE = 272,                   /* WHOSE  */
-    HAVING = 273,                  /* HAVING  */
-    WITH = 274,                    /* WITH  */
-    IS = 275,                      /* IS  */
-    ARE = 276,                     /* ARE  */
-    MORETHAN = 277,                /* MORETHAN  */
-    LESSTHAN = 278,                /* LESSTHAN  */
-    EQUALTO = 279,                 /* EQUALTO  */
-    NO = 280,                      /* NO  */
-    AND = 281,                     /* AND  */
-    OF = 282,                      /* OF  */
-    NUMBER = 283                   /* NUMBER  */
+    KINDLY = 258,                  /* KINDLY  */
+    FETCH = 259,                   /* FETCH  */
+    DISPLAY = 260,                 /* DISPLAY  */
+    EVERY = 261,                   /* EVERY  */
+    DETAILS = 262,                 /* DETAILS  */
+    FOR = 263,                     /* FOR  */
+    STUDENTS = 264,                /* STUDENTS  */
+    LIST = 265,                    /* LIST  */
+    WITH = 266,                    /* WITH  */
+    VALUE = 267,                   /* VALUE  */
+    HIGHER = 268,                  /* HIGHER  */
+    THAN = 269,                    /* THAN  */
+    LOWER = 270,                   /* LOWER  */
+    SAME = 271,                    /* SAME  */
+    AS = 272,                      /* AS  */
+    MODIFY = 273,                  /* MODIFY  */
+    CHANGE = 274,                  /* CHANGE  */
+    TO = 275,                      /* TO  */
+    CALLED = 276,                  /* CALLED  */
+    ROLL = 277,                    /* ROLL  */
+    CPI = 278,                     /* CPI  */
+    NAMES = 279,                   /* NAMES  */
+    ROLLS = 280,                   /* ROLLS  */
+    CPIS = 281,                    /* CPIS  */
+    AND = 282,                     /* AND  */
+    NUMBERVAL = 283                /* NUMBERVAL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define REQUEST 258
-#define GIVE 259
-#define SHOW 260
-#define UPDATE 261
-#define ME 262
-#define THE 263
-#define ALL 264
-#define INFORMATION 265
-#define ROLLNUMBERS 266
-#define ROLLNUMBER 267
-#define NAME 268
-#define CPI 269
-#define STUDENTS 270
-#define STUDENT 271
-#define WHOSE 272
-#define HAVING 273
-#define WITH 274
-#define IS 275
-#define ARE 276
-#define MORETHAN 277
-#define LESSTHAN 278
-#define EQUALTO 279
-#define NO 280
-#define AND 281
-#define OF 282
-#define NUMBER 283
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 21 "Q.y"
+#line 11 "parser.y"
 
-    int num;
     char *str;
+    float num;
 
-#line 128 "y.tab.h"
+#line 97 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -139,4 +108,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */

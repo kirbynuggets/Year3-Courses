@@ -4,134 +4,79 @@
 #include <stdlib.h>
 
 void yyerror(const char *s);
-int yylex();
-
-/* Global variables for SQL generation */
-char *fields[10];
-int field_count = 0;
-char *table = NULL;
-char *condition_field = NULL;
-char *condition_op = NULL;
-int condition_value = 0;
-char *update_field = NULL;
-int update_value = 0;
-int is_update = 0;
+int yylex(void);
+void yy_scan_string(const char *str);
 %}
 
 %union {
-    int num;
     char *str;
+    float num;
 }
 
-%token REQUEST GIVE SHOW UPDATE ME THE ALL INFORMATION 
-%token ROLLNUMBERS ROLLNUMBER NAME CPI STUDENTS STUDENT
-%token WHOSE HAVING WITH IS ARE MORETHAN LESSTHAN EQUALTO NO AND OF
-%token <num> NUMBER
-%type <str> field op comparison query_spec condition
-%type <num> value
+%token KINDLY FETCH DISPLAY EVERY DETAILS FOR STUDENTS LIST WITH VALUE HIGHER THAN LOWER SAME AS MODIFY CHANGE TO CALLED ROLL CPI NAMES ROLLS CPIS AND
+%token <num> NUMBERVAL
+
+%type <str> attr_list attr condition comp select_stmt update_stmt
 
 %%
 
-start: request query_type query_spec condition { 
-        if (is_update) {
-            printf("update Student set %s=%d where %s %s %d;\n", 
-                   update_field, update_value, 
-                   condition_field, condition_op, condition_value);
-        } else {
-            printf("select ");
-            if (field_count == 0 || strcmp(fields[0], "all the information") == 0) {
-                printf("*");
-            } else {
-                for (int i = 0; i < field_count; i++) {
-                    if (strcmp(fields[i], "roll numbers") == 0) {
-                        printf("roll");
-                    } else if (strcmp(fields[i], "roll number") == 0) {
-                        printf("roll");
-                    } else {
-                        printf("%s", fields[i]);
-                    }
-                    if (i < field_count - 1) printf(", ");
-                }
-            }
-            printf(" from Student");
-            if (condition_field != NULL) {
-                printf(" where %s %s %d", condition_field, condition_op, condition_value);
-            }
-            printf(";\n");
+start: select_stmt { 
+            printf("SQL query: %s\n", $1); 
         }
-    }
+     | update_stmt { 
+            printf("SQL query: %s\n", $1); 
+        }
+     ;
+
+select_stmt: KINDLY FETCH attr_list FOR STUDENTS
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select %s from Student", $3); 
+             $$ = tmp; }
+           | KINDLY DISPLAY EVERY DETAILS FOR STUDENTS
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select * from Student"); 
+             $$ = tmp; }
+           | LIST attr_list FOR STUDENTS
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select %s from Student", $2); 
+             $$ = tmp; }
+           | LIST attr_list FOR STUDENTS WITH condition
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "select %s from Student where %s", $2, $6); 
+             $$ = tmp; }
+           ;
+
+update_stmt: MODIFY CPI FOR STUDENTS CALLED NUMBERVAL TO NUMBERVAL
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "update Student set cpi=%f where roll=%f", $8, $6); 
+             $$ = tmp; }
+           | CHANGE CPI TO NUMBERVAL FOR STUDENTS WITH ROLL NUMBERVAL
+           { char *tmp = malloc(100); 
+             sprintf(tmp, "update Student set cpi=%f where roll=%f", $4, $9); 
+             $$ = tmp; }
+           ;
+
+attr_list: attr { $$ = $1; }
+         | attr_list AND attr 
+         { char *tmp = malloc(100); 
+           sprintf(tmp, "%s, %s", $1, $3); 
+           $$ = tmp; }
+         ;
+
+attr: NAMES { $$ = "name"; }
+    | ROLLS { $$ = "roll"; }
+    | CPIS { $$ = "cpi"; }
     ;
 
-request: REQUEST { }
-    ;
+condition: CPI VALUE comp NUMBERVAL
+         { char *tmp = malloc(100); 
+           sprintf(tmp, "cpi %s %f", $3, $4); 
+           $$ = tmp; }
+         ;
 
-query_type: action
-    | ME item_list { }
-    | THE field OF target { }
-    ;
-
-action: GIVE { }
-    | SHOW { }
-    | UPDATE { is_update = 1; }
-    ;
-
-item_list: ALL THE INFORMATION { 
-        fields[0] = "all the information"; 
-        field_count = 1; 
-    }
-    | field_list { }
-    ;
-
-field_list: field { 
-        fields[field_count++] = $1; 
-    }
-    | field AND field_list { 
-        fields[field_count++] = $1; 
-    }
-    ;
-
-field: ROLLNUMBERS { $$ = "roll numbers"; }
-    | ROLLNUMBER { $$ = "roll number"; }
-    | NAME { $$ = "name"; }
-    | CPI { $$ = "cpi"; }
-    | INFORMATION { $$ = "information"; }
-    ;
-
-target: THE STUDENTS { table = "Student"; }
-    | THE STUDENT { table = "Student"; }
-    ;
-
-query_spec: WHOSE field comparison value { 
-        condition_field = $2; 
-        condition_op = $3; 
-        condition_value = $4; 
-    }
-    | /* empty */ { $$ = NULL; }
-    ;
-
-condition: HAVING field NO value { 
-        condition_field = $2; 
-        condition_op = "="; 
-        condition_value = $4; 
-    }
-    | WITH field comparison value { 
-        condition_field = $2; 
-        condition_op = $3; 
-        condition_value = $4; 
-    }
-    | /* empty */ { $$ = NULL; }
-    ;
-
-comparison: IS op { $$ = $2; }
-    | ARE op { $$ = $2; }
-    ;
-
-op: MORETHAN { $$ = ">"; }
-    | LESSTHAN { $$ = "<"; }
-    | EQUALTO { $$ = "="; }
-    ;
-
-value: NUMBER { $$ = $1; }
+comp: HIGHER THAN { $$ = ">"; }
+    | LOWER THAN { $$ = "<"; }
+    | SAME AS { $$ = "="; }
     ;
 
 %%
@@ -141,7 +86,17 @@ void yyerror(const char *s) {
 }
 
 int main() {
-    printf("Enter your English query (end with a newline):\n");
-    yyparse();
-    return 0;
+    char query[256];  
+    printf("Enter your query: ");
+    if (fgets(query, sizeof(query), stdin) == NULL) {
+        perror("Error reading query");
+        return 1;
+    }
+    
+    printf("User query: %s", query);
+
+    
+    yy_scan_string(query);  
+    int result = yyparse();
+    return result;
 }

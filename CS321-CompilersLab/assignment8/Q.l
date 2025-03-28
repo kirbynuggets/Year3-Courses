@@ -1,41 +1,41 @@
 %{
-#include <stdio.h>
+#include "parser.tab.h"
 #include <string.h>
-#include "y.tab.h"
 %}
 
 %%
 
-[Pp][Ll][Ee][Aa][Ss][Ee]    { return REQUEST; }
-[Gg][Ii][Vv][Ee]            { return GIVE; }
-[Ss][Hh][Oo][Ww]            { return SHOW; }
-[Uu][Pp][Dd][Aa][Tt][Ee]     { return UPDATE; }
-[Mm][Ee]                    { return ME; }
-[Tt][Hh][Ee]                { return THE; }
-[Aa][Ll][Ll]                { return ALL; }
-[Ii][Nn][Ff][Oo][Rr][Mm][Aa][Tt][Ii][Oo][Nn] { return INFORMATION; }
-[Rr][Oo][Ll][Nn][Uu][Mm][Bb][Ee][Rr][Ss] { return ROLLNUMBERS; }
-[Rr][Oo][Ll][Nn][Uu][Mm][Bb][Ee][Rr] { return ROLLNUMBER; }
-[Nn][Aa][Mm][Ee]            { return NAME; }
-[Cc][Pp][Ii]                { return CPI; }
+[ \t\n]+                /* ignore whitespace */
+
+[Kk][Ii][Nn][Dd][Ll][Yy] { return KINDLY; }
+[Ff][Ee][Tt][Cc][Hh]    { return FETCH; }
+[Dd][Ii][Ss][Pp][Ll][Aa][Yy] { return DISPLAY; }
+[Ee][Vv][Ee][Rr][Yy]   { return EVERY; }
+[Dd][Ee][Tt][Aa][Ii][Ll][Ss] { return DETAILS; }
+[Ff][Oo][Rr]         { return FOR; }
 [Ss][Tt][Uu][Dd][Ee][Nn][Tt][Ss] { return STUDENTS; }
-[Ss][Tt][Uu][Dd][Ee][Nn][Tt] { return STUDENT; }
-[Ww][Hh][Oo][Ss][Ee]        { return WHOSE; }
-[Hh][Aa][Vv][Ii][Nn][Gg]    { return HAVING; }
-[Ww][Ii][Tt][Hh]            { return WITH; }
-[Ii][Ss]                    { return IS; }
-[Aa][Rr][Ee]                { return ARE; }
-[Mm][Oo][Rr][Ee][Tt][Hh][Aa][Nn] { return MORETHAN; }
-[Ll][Ee][Ss][Ss][Tt][Hh][Aa][Nn] { return LESSTHAN; }
-[Ee][Qq][Uu][Aa][Ll][Tt][Oo] { return EQUALTO; }
-[Nn][Oo]                    { return NO; }
-[Aa][Nn][Dd]                { return AND; }
-[Oo][Ff]                    { return OF; }
-[0-9]+                      { yylval.num = atoi(yytext); return NUMBER; }
-[.,]                        ;
-[\n]                        { return 0; }
-[ \t]                       ;
-.                           { printf("Unknown token: %s\n", yytext); }
+[Ll][Ii][Ss][Tt]      { return LIST; }
+[Ww][Ii][Tt][Hh]     { return WITH; }
+[Vv][Aa][Ll][Uu][Ee]  { return VALUE; }
+[Hh][Ii][Gg][Hh][Ee][Rr] { return HIGHER; }
+[Tt][Hh][Aa][Nn]     { return THAN; }
+[Ll][Oo][Ww][Ee][Rr]  { return LOWER; }
+[Ss][Aa][Mm][Ee]      { return SAME; }
+[Aa][Ss]             { return AS; }
+[Mm][Oo][Dd][Ii][Ff][Yy] { return MODIFY; }
+[Cc][Hh][Aa][Nn][Gg][Ee] { return CHANGE; }
+[Tt][Oo]             { return TO; }
+[Cc][Aa][Ll][Ll][Ee][Dd] { return CALLED; }
+[Rr][Oo][Ll][Ll]       { return ROLL; }
+[Rr][Oo][Ll][Ll][Ss]   { return ROLLS; }
+[Cc][Pp][Ii]          { return CPI; }
+[Cc][Pp][Ii][Ss]      { return CPIS; }
+[Nn][Aa][Mm][Ee][Ss]  { return NAMES; }
+[Aa][Nn][Dd]         { return AND; }
+
+[0-9]+(\.[0-9]+)?      { yylval.num = atof(yytext); return NUMBERVAL; }
+
+.                      { /* ignore other characters */ }
 
 %%
 
