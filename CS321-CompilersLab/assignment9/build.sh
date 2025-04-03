@@ -3,7 +3,7 @@
 echo "Compiling the lexical analyzer and parser..."
 bison -d -y Q.y
 flex Q.l
-g++ -o compiler y.tab.c -lfl
+gcc -Wall -g -o compiler y.tab.c lex.yy.c -lfl
 
 echo "Running the compiler on test inputs..."
 
@@ -19,4 +19,4 @@ echo "3. Triangle Area Calculation Program:"
 ./compiler triangle.txt triangle_output.txt
 echo "Output written to triangle_output.txt"
 
-echo "All tests complete. Check the output files for results."
+echo "All tests complete. Check the output files for results."  
