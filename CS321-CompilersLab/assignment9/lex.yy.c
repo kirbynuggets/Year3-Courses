@@ -162,27 +162,8 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
     
-    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
-     *       access to the local variable yy_act. Since yyless() is a macro, it would break
-     *       existing scanners that call yyless() from OUTSIDE yylex.
-     *       One obvious solution it to make yy_act a global. I tried that, and saw
-     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
-     *       normally declared as a register variable-- so it is not worth it.
-     */
-    #define  YY_LESS_LINENO(n) \
-            do { \
-                int yyl;\
-                for ( yyl = n; yyl < yyleng; ++yyl )\
-                    if ( yytext[yyl] == '\n' )\
-                        --yylineno;\
-            }while(0)
-    #define YY_LINENO_REWIND_TO(dst) \
-            do {\
-                const char *p;\
-                for ( p = yy_cp-1; p >= (dst); --p)\
-                    if ( *p == '\n' )\
-                        --yylineno;\
-            }while(0)
+    #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -341,9 +322,6 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
-
-#define yywrap() (/*CONSTCOND*/1)
-#define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -373,8 +351,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 46
-#define YY_END_OF_BUFFER 47
+#define YY_NUM_RULES 17
+#define YY_END_OF_BUFFER 18
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -382,20 +360,12 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[108] =
+static const flex_int16_t yy_accept[35] =
     {   0,
-        0,    0,   47,   45,    1,    1,   45,   45,   23,   38,
-       29,   34,    9,   27,   12,   11,    3,    8,   40,   26,
-       15,   20,   43,   24,   39,   43,   43,   43,   43,   43,
-       43,   43,   43,   43,   43,   43,   43,   43,    1,    0,
-        5,    2,   44,    0,    3,    0,    7,   25,   30,   18,
-       43,   43,   43,   43,   43,   43,   43,   43,   21,   43,
-       43,   43,   43,   33,   43,   43,   43,   43,   44,    4,
-        0,    4,    6,   10,   43,   14,   43,   43,   43,   22,
-       28,   31,   43,   43,   43,   43,   43,   43,   13,   16,
-       43,   43,   32,   43,   43,   37,   41,   43,   17,   43,
-
-       35,   43,   42,   19,   43,   36,    0
+        0,    0,   18,   16,    1,    1,   16,   12,   15,   14,
+       10,   15,   11,   13,   13,   13,   13,    7,   14,    8,
+        6,    9,   13,   13,    3,   13,   13,   13,    2,   13,
+        4,   13,    5,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -403,17 +373,17 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    1,    4,    1,    1,    5,    1,    1,    6,
-        7,    8,    9,   10,   11,   12,   13,   14,   14,   14,
-       14,   14,   14,   14,   14,   14,   14,   15,   16,   17,
-       18,   19,    1,    1,   20,   20,   20,   20,   21,   20,
-       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
-       20,   20,   20,   20,   20,   20,   20,   20,   20,   20,
-       22,    1,   23,    1,    1,    1,   24,   25,   26,   27,
+        1,    2,    4,    1,    1,    1,    5,    1,    1,    6,
+        6,    6,    6,    1,    6,    1,    6,    7,    7,    7,
+        7,    7,    7,    7,    7,    7,    7,    1,    6,    8,
+        9,   10,    1,    1,   11,   11,   11,   11,   11,   11,
+       11,   11,   11,   11,   11,   11,   11,   11,   11,   11,
+       11,   11,   11,   11,   11,   11,   11,   11,   11,   11,
+        1,    1,    1,    1,    1,    1,   11,   11,   11,   11,
 
-       28,   29,   30,   31,   32,   20,   33,   34,   35,   36,
-       37,   38,   20,   39,   40,   41,   42,   20,   43,   44,
-       20,   20,    1,    1,    1,    1,    1,    1,    1,    1,
+       12,   13,   11,   14,   15,   11,   11,   16,   11,   17,
+       11,   11,   11,   11,   18,   19,   11,   11,   20,   11,
+       11,   11,    6,    1,    6,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -430,99 +400,47 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[45] =
+static const YY_CHAR yy_meta[21] =
     {   0,
-        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    3,    1,    1,    1,    1,    1,    3,
-        3,    1,    1,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
-        3,    3,    3,    3
+        1,    1,    1,    1,    1,    1,    2,    1,    1,    1,
+        2,    2,    2,    2,    2,    2,    2,    2,    2,    2
     } ;
 
-static const flex_int16_t yy_base[111] =
+static const flex_int16_t yy_base[36] =
     {   0,
-        0,    0,  132,  133,   43,   45,  127,   22,  133,  133,
-      133,  133,  133,  133,  133,  117,   38,  111,  133,   35,
-      133,  110,    0,  133,  133,   91,   98,   21,   91,   90,
-       27,   86,   24,   83,   82,   92,   86,   87,   65,  113,
-      112,  133,    0,  101,   57,   61,  133,  133,  133,  133,
-        0,   87,   84,   72,   84,   78,   72,   71,    0,   66,
-       79,   64,   70,    0,   42,   79,   70,   69,    0,   59,
-       86,   85,    0,    0,   70,    0,   56,   72,   70,    0,
-        0,    0,   60,   57,   65,   64,   52,   55,    0,    0,
-       47,   63,    0,   44,   40,    0,    0,   49,    0,   42,
-
-        0,   38,    0,    0,   19,    0,  133,   80,   55,   83
+        0,    0,   38,   39,   39,   39,   28,   39,   39,   29,
+       26,   25,   24,    0,   16,    8,   17,   39,   23,   39,
+       39,   39,    0,   11,    0,    9,   12,   14,    0,    8,
+        0,   11,    0,   39,   20
     } ;
 
-static const flex_int16_t yy_def[111] =
+static const flex_int16_t yy_def[36] =
     {   0,
-      107,    1,  107,  107,  107,  107,  108,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  109,  107,  107,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  107,  108,
-      108,  107,  110,  107,  107,  107,  107,  107,  107,  107,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  110,  107,
-      107,  107,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-      109,  109,  109,  109,  109,  109,  109,  109,  109,  109,
-
-      109,  109,  109,  109,  109,  109,    0,  107,  107,  107
+       34,    1,   34,   34,   34,   34,   34,   34,   34,   34,
+       34,   34,   34,   35,   35,   35,   35,   34,   34,   34,
+       34,   34,   35,   35,   35,   35,   35,   35,   35,   35,
+       35,   35,   35,    0,   34
     } ;
 
-static const flex_int16_t yy_nxt[178] =
+static const flex_int16_t yy_nxt[60] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
-       14,   15,   16,   17,   18,   19,   20,   21,   22,   23,
-       23,   24,   25,   26,   23,   23,   27,   28,   29,   30,
-       23,   31,   23,   23,   32,   33,   34,   35,   36,   37,
-       23,   23,   38,   23,   39,   39,   39,   39,   42,   44,
-       42,   45,   48,   49,   54,   59,   55,   51,   46,  106,
-       62,   42,   60,  105,   56,   63,   39,   39,   44,   71,
-       45,   71,   70,   84,   72,  104,  103,   46,   85,   46,
-       40,  102,   40,   69,  101,   69,  100,   99,   98,   97,
-       96,   95,   94,   93,   92,   91,   90,   89,   72,   72,
-
-       88,   87,   86,   83,   82,   81,   80,   79,   78,   77,
-       76,   75,   74,   73,   70,   41,   41,   68,   67,   66,
-       65,   64,   61,   58,   57,   53,   52,   50,   47,   43,
-       41,  107,    3,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107
+       14,   15,   14,   14,   16,   14,   14,   14,   14,   17,
+       25,   23,   33,   32,   26,   31,   30,   29,   28,   19,
+       27,   24,   22,   21,   20,   19,   18,   34,    3,   34,
+       34,   34,   34,   34,   34,   34,   34,   34,   34,   34,
+       34,   34,   34,   34,   34,   34,   34,   34,   34
     } ;
 
-static const flex_int16_t yy_chk[178] =
+static const flex_int16_t yy_chk[60] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    5,    5,    6,    6,    8,   17,
-        8,   17,   20,   20,   28,   31,   28,  109,   17,  105,
-       33,    8,   31,  102,   28,   33,   39,   39,   45,   46,
-       45,   46,   70,   65,   46,  100,   98,   45,   65,   70,
-      108,   95,  108,  110,   94,  110,   92,   91,   88,   87,
-       86,   85,   84,   83,   79,   78,   77,   75,   72,   71,
-
-       68,   67,   66,   63,   62,   61,   60,   58,   57,   56,
-       55,   54,   53,   52,   44,   41,   40,   38,   37,   36,
-       35,   34,   32,   30,   29,   27,   26,   22,   18,   16,
-        7,    3,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107,  107,  107,  107,
-      107,  107,  107,  107,  107,  107,  107
+       16,   35,   32,   30,   16,   28,   27,   26,   24,   19,
+       17,   15,   13,   12,   11,   10,    7,    3,   34,   34,
+       34,   34,   34,   34,   34,   34,   34,   34,   34,   34,
+       34,   34,   34,   34,   34,   34,   34,   34,   34
     } ;
-
-/* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[47] =
-    {   0,
-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -540,14 +458,11 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "Q.l"
 #line 2 "Q.l"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "y.tab.h"
-
-extern YYSTYPE yylval;
-#line 550 "lex.yy.c"
-#line 551 "lex.yy.c"
+#include <stdio.h>
+#include <string.h>
+#line 465 "lex.yy.c"
+#line 466 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -764,9 +679,9 @@ YY_DECL
 		}
 
 	{
-#line 70 "Q.l"
+#line 7 "Q.l"
 
-#line 770 "lex.yy.c"
+#line 685 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -793,13 +708,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 108 )
+				if ( yy_current_state >= 35 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 133 );
+		while ( yy_base[yy_current_state] != 39 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -811,16 +726,6 @@ yy_find_action:
 			}
 
 		YY_DO_BEFORE_ACTION;
-
-		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
-			{
-			int yyl;
-			for ( yyl = 0; yyl < yyleng; ++yyl )
-				if ( yytext[yyl] == '\n' )
-					
-    yylineno++;
-;
-			}
 
 do_action:	/* This label is used only to access EOF actions. */
 
@@ -836,449 +741,96 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 71 "Q.l"
-{ }
+#line 8 "Q.l"
+; // Ignore whitespace
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 73 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return FORMAT; 
-                    }
+#line 9 "Q.l"
+{ return INT; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 80 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return INT_CONST; 
-                    }
+#line 10 "Q.l"
+{ return IF; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 86 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return FLOAT_CONST; 
-                    }
+#line 11 "Q.l"
+{ return ELSE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 92 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return STRING; 
-                    }
+#line 12 "Q.l"
+{ return WHILE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 99 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return AND; 
-                    }
+#line 13 "Q.l"
+{ return EQ; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 105 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return ASSIGN; 
-                    }
+#line 14 "Q.l"
+{ return NE; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 111 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return COLON; 
-                    }
+#line 15 "Q.l"
+{ return LE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 117 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return COMMA; 
-                    }
+#line 16 "Q.l"
+{ return GE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 123 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return DEF; 
-                    }
+#line 17 "Q.l"
+{ return LT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 129 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return DIV; 
-                    }
+#line 18 "Q.l"
+{ return GT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 135 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return DOT; 
-                    }
+#line 19 "Q.l"
+{ return MOD; }  
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 141 "Q.l"
+#line 20 "Q.l"
 { 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return ELSE; 
-                    }
+    yylval.str = strdup(yytext); 
+    return ID; 
+}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 147 "Q.l"
+#line 24 "Q.l"
 { 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return END; 
-                    }
+    yylval.num = atoi(yytext); 
+    return NUM; 
+}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 153 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return EQ; 
-                    }
+#line 28 "Q.l"
+{ return yytext[0]; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 159 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return EXITLOOP; 
-                    }
+#line 29 "Q.l"
+{ printf("Invalid character: %s\n", yytext); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 165 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return FLOAT; 
-                    }
-	YY_BREAK
-case 18:
-YY_RULE_SETUP
-#line 171 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return GE; 
-                    }
-	YY_BREAK
-case 19:
-YY_RULE_SETUP
-#line 177 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return GLOBAL; 
-                    }
-	YY_BREAK
-case 20:
-YY_RULE_SETUP
-#line 183 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return GT; 
-                    }
-	YY_BREAK
-case 21:
-YY_RULE_SETUP
-#line 189 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return IF; 
-                    }
-	YY_BREAK
-case 22:
-YY_RULE_SETUP
-#line 195 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return INT; 
-                    }
-	YY_BREAK
-case 23:
-YY_RULE_SETUP
-#line 201 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return LEFT_PAREN; 
-                    }
-	YY_BREAK
-case 24:
-YY_RULE_SETUP
-#line 207 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return LEFT_SQ_BKT; 
-                    }
-	YY_BREAK
-case 25:
-YY_RULE_SETUP
-#line 213 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return LE; 
-                    }
-	YY_BREAK
-case 26:
-YY_RULE_SETUP
-#line 219 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return LT; 
-                    }
-	YY_BREAK
-case 27:
-YY_RULE_SETUP
-#line 225 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return MINUS; 
-                    }
-	YY_BREAK
-case 28:
-YY_RULE_SETUP
-#line 231 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return MOD; 
-                    }
-	YY_BREAK
-case 29:
-YY_RULE_SETUP
-#line 237 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return MULT; 
-                    }
-	YY_BREAK
-case 30:
-YY_RULE_SETUP
-#line 243 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return NE; 
-                    }
-	YY_BREAK
-case 31:
-YY_RULE_SETUP
-#line 249 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return NOT; 
-                    }
-	YY_BREAK
-case 32:
-YY_RULE_SETUP
-#line 255 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return NUL; 
-                    }
-	YY_BREAK
-case 33:
-YY_RULE_SETUP
-#line 261 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return OR; 
-                    }
-	YY_BREAK
-case 34:
-YY_RULE_SETUP
-#line 267 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return PLUS; 
-                    }
-	YY_BREAK
-case 35:
-YY_RULE_SETUP
-#line 273 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return PRINT; 
-                    }
-	YY_BREAK
-case 36:
-YY_RULE_SETUP
-#line 279 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return PRODUCT; 
-                    }
-	YY_BREAK
-case 37:
-YY_RULE_SETUP
-#line 285 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return READ; 
-                    }
-	YY_BREAK
-case 38:
-YY_RULE_SETUP
-#line 291 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return RIGHT_PAREN; 
-                    }
-	YY_BREAK
-case 39:
-YY_RULE_SETUP
-#line 297 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return RIGHT_SQ_BKT; 
-                    }
-	YY_BREAK
-case 40:
-YY_RULE_SETUP
-#line 303 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return SEMICOLON; 
-                    }
-	YY_BREAK
-case 41:
-YY_RULE_SETUP
-#line 309 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return SKIP; 
-                    }
-	YY_BREAK
-case 42:
-YY_RULE_SETUP
-#line 315 "Q.l"
-{ 
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return WHILE; 
-                    }
-	YY_BREAK
-case 43:
-YY_RULE_SETUP
-#line 322 "Q.l"
-{
-                         char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
-                         strcpy(temp, yytext);
-                         yylval.code_str = temp; 
-                         return ID; 
-                    }
-	YY_BREAK
-case 44:
-YY_RULE_SETUP
-#line 328 "Q.l"
-{ }
-	YY_BREAK
-case 45:
-YY_RULE_SETUP
-#line 329 "Q.l"
-{ 
-                        printf("- |%s|", yytext);
-                        yyerror("Invalid character encountered!"); 
-                        return -1;
-                   }
-	YY_BREAK
-case 46:
-YY_RULE_SETUP
-#line 334 "Q.l"
+#line 30 "Q.l"
 ECHO;
 	YY_BREAK
-#line 1282 "lex.yy.c"
+#line 834 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1575,7 +1127,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 108 )
+			if ( yy_current_state >= 35 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1603,11 +1155,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 108 )
+		if ( yy_current_state >= 35 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 107);
+	yy_is_jam = (yy_current_state == 34);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1645,10 +1197,6 @@ static int yy_get_next_buffer (void)
 		}
 
 	*--yy_cp = (char) c;
-
-    if ( c == '\n' ){
-        --yylineno;
-    }
 
 	(yytext_ptr) = yy_bp;
 	(yy_hold_char) = *yy_cp;
@@ -1726,11 +1274,6 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
-
-	if ( c == '\n' )
-		
-    yylineno++;
-;
 
 	return c;
 }
@@ -2198,9 +1741,6 @@ static int yy_init_globals (void)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
-    /* We do not touch yylineno unless the option is enabled. */
-    yylineno =  1;
-    
     (yy_buffer_stack) = NULL;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -2295,5 +1835,9 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 334 "Q.l"
+#line 30 "Q.l"
 
+
+int yywrap() {
+    return 1;
+}

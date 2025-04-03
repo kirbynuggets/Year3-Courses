@@ -1,7 +1,0 @@
-global
-	if i<10:
-		i:=i+1
-	end;
-
-	a := b + c
-end

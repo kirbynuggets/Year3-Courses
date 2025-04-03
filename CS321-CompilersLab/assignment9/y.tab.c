@@ -69,61 +69,49 @@
 /* First part of user prologue.  */
 #line 1 "Q.y"
 
-#define YYDEBUG 0
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include <iostream>
-#include <fstream>
+int temp_count = 0;
+int label_count = 0;
 
-using namespace std;
+void yyerror(char *s);
+int yylex();
 
-ofstream outfile;
-
-int yyerror(char *s);
-
-#include "block.hpp"
-
-#include "y.tab.h"
-#include "lex.yy.c"
-
-int var_index = 0;
-int label_index = 0;
-
-string new_variable()
-{
-    string v = "v";
-    v+=to_string(var_index++);
-    return v;
+char* new_temp() {
+    char* temp = (char*)malloc(10);
+    sprintf(temp, "t%d", temp_count++);
+    return temp;
 }
 
-string new_label()
-{
-    string label="_L";
-    label+=to_string(label_index++);
-    
+char* new_label() {
+    char* label = (char*)malloc(10);
+    sprintf(label, "L%d", label_count++);
     return label;
 }
 
-Block* newline()
-{
-    Block* block = new Block();
-    Code* curr = new Code();
-    curr->append("\n");
-    block->code=curr;
-
-    return block;
+void emit(char* op, char* arg1, char* arg2, char* result) {
+    printf("%s = %s %s %s\n", result, arg1, op, arg2);
 }
 
-Block* colon()
-{
-    Block* block = new Block();
-    Code* curr = new Code();
-    curr->append(" :");
-    block->code=curr;
-
-    return block;
+void emit_assign(char* src, char* dst) {
+    printf("%s = %s\n", dst, src);
 }
 
-#line 127 "y.tab.c"
+void emit_label(char* label) {
+    printf("%s:\n", label);
+}
+
+void emit_jump(char* label) {
+    printf("goto %s\n", label);
+}
+
+void emit_if(char* cond, char* label) {
+    printf("if %s goto %s\n", cond, label);
+}
+
+#line 115 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -167,48 +155,19 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    AND = 258,                     /* AND  */
-    ASSIGN = 259,                  /* ASSIGN  */
-    COLON = 260,                   /* COLON  */
-    COMMA = 261,                   /* COMMA  */
-    DEF = 262,                     /* DEF  */
-    DIV = 263,                     /* DIV  */
-    DOT = 264,                     /* DOT  */
-    ELSE = 265,                    /* ELSE  */
-    END = 266,                     /* END  */
-    EQ = 267,                      /* EQ  */
-    EXITLOOP = 268,                /* EXITLOOP  */
-    FLOAT = 269,                   /* FLOAT  */
-    FLOAT_CONST = 270,             /* FLOAT_CONST  */
-    FORMAT = 271,                  /* FORMAT  */
-    GE = 272,                      /* GE  */
-    GLOBAL = 273,                  /* GLOBAL  */
-    GT = 274,                      /* GT  */
-    ID = 275,                      /* ID  */
-    IF = 276,                      /* IF  */
-    INT = 277,                     /* INT  */
-    INT_CONST = 278,               /* INT_CONST  */
-    LEFT_PAREN = 279,              /* LEFT_PAREN  */
-    LEFT_SQ_BKT = 280,             /* LEFT_SQ_BKT  */
-    LE = 281,                      /* LE  */
-    LT = 282,                      /* LT  */
-    MINUS = 283,                   /* MINUS  */
-    MOD = 284,                     /* MOD  */
-    MULT = 285,                    /* MULT  */
-    NE = 286,                      /* NE  */
-    NOT = 287,                     /* NOT  */
-    NUL = 288,                     /* NUL  */
-    OR = 289,                      /* OR  */
-    PLUS = 290,                    /* PLUS  */
-    PRINT = 291,                   /* PRINT  */
-    PRODUCT = 292,                 /* PRODUCT  */
-    READ = 293,                    /* READ  */
-    RIGHT_PAREN = 294,             /* RIGHT_PAREN  */
-    RIGHT_SQ_BKT = 295,            /* RIGHT_SQ_BKT  */
-    SEMICOLON = 296,               /* SEMICOLON  */
-    SKIP = 297,                    /* SKIP  */
-    STRING = 298,                  /* STRING  */
-    WHILE = 299                    /* WHILE  */
+    INT = 258,                     /* INT  */
+    IF = 259,                      /* IF  */
+    ELSE = 260,                    /* ELSE  */
+    WHILE = 261,                   /* WHILE  */
+    EQ = 262,                      /* EQ  */
+    NE = 263,                      /* NE  */
+    LE = 264,                      /* LE  */
+    GE = 265,                      /* GE  */
+    LT = 266,                      /* LT  */
+    GT = 267,                      /* GT  */
+    ID = 268,                      /* ID  */
+    NUM = 269,                     /* NUM  */
+    MOD = 270                      /* MOD  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -217,59 +176,30 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define AND 258
-#define ASSIGN 259
-#define COLON 260
-#define COMMA 261
-#define DEF 262
-#define DIV 263
-#define DOT 264
-#define ELSE 265
-#define END 266
-#define EQ 267
-#define EXITLOOP 268
-#define FLOAT 269
-#define FLOAT_CONST 270
-#define FORMAT 271
-#define GE 272
-#define GLOBAL 273
-#define GT 274
-#define ID 275
-#define IF 276
-#define INT 277
-#define INT_CONST 278
-#define LEFT_PAREN 279
-#define LEFT_SQ_BKT 280
-#define LE 281
-#define LT 282
-#define MINUS 283
-#define MOD 284
-#define MULT 285
-#define NE 286
-#define NOT 287
-#define NUL 288
-#define OR 289
-#define PLUS 290
-#define PRINT 291
-#define PRODUCT 292
-#define READ 293
-#define RIGHT_PAREN 294
-#define RIGHT_SQ_BKT 295
-#define SEMICOLON 296
-#define SKIP 297
-#define STRING 298
-#define WHILE 299
+#define INT 258
+#define IF 259
+#define ELSE 260
+#define WHILE 261
+#define EQ 262
+#define NE 263
+#define LE 264
+#define GE 265
+#define LT 266
+#define GT 267
+#define ID 268
+#define NUM 269
+#define MOD 270
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 73 "Q.y"
+#line 45 "Q.y"
 
-    Block* block;
-    char* code_str;
+    char* str;
+    int num;
 
-#line 273 "y.tab.c"
+#line 203 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -292,79 +222,38 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_AND = 3,                        /* AND  */
-  YYSYMBOL_ASSIGN = 4,                     /* ASSIGN  */
-  YYSYMBOL_COLON = 5,                      /* COLON  */
-  YYSYMBOL_COMMA = 6,                      /* COMMA  */
-  YYSYMBOL_DEF = 7,                        /* DEF  */
-  YYSYMBOL_DIV = 8,                        /* DIV  */
-  YYSYMBOL_DOT = 9,                        /* DOT  */
-  YYSYMBOL_ELSE = 10,                      /* ELSE  */
-  YYSYMBOL_END = 11,                       /* END  */
-  YYSYMBOL_EQ = 12,                        /* EQ  */
-  YYSYMBOL_EXITLOOP = 13,                  /* EXITLOOP  */
-  YYSYMBOL_FLOAT = 14,                     /* FLOAT  */
-  YYSYMBOL_FLOAT_CONST = 15,               /* FLOAT_CONST  */
-  YYSYMBOL_FORMAT = 16,                    /* FORMAT  */
-  YYSYMBOL_GE = 17,                        /* GE  */
-  YYSYMBOL_GLOBAL = 18,                    /* GLOBAL  */
-  YYSYMBOL_GT = 19,                        /* GT  */
-  YYSYMBOL_ID = 20,                        /* ID  */
-  YYSYMBOL_IF = 21,                        /* IF  */
-  YYSYMBOL_INT = 22,                       /* INT  */
-  YYSYMBOL_INT_CONST = 23,                 /* INT_CONST  */
-  YYSYMBOL_LEFT_PAREN = 24,                /* LEFT_PAREN  */
-  YYSYMBOL_LEFT_SQ_BKT = 25,               /* LEFT_SQ_BKT  */
-  YYSYMBOL_LE = 26,                        /* LE  */
-  YYSYMBOL_LT = 27,                        /* LT  */
-  YYSYMBOL_MINUS = 28,                     /* MINUS  */
-  YYSYMBOL_MOD = 29,                       /* MOD  */
-  YYSYMBOL_MULT = 30,                      /* MULT  */
-  YYSYMBOL_NE = 31,                        /* NE  */
-  YYSYMBOL_NOT = 32,                       /* NOT  */
-  YYSYMBOL_NUL = 33,                       /* NUL  */
-  YYSYMBOL_OR = 34,                        /* OR  */
-  YYSYMBOL_PLUS = 35,                      /* PLUS  */
-  YYSYMBOL_PRINT = 36,                     /* PRINT  */
-  YYSYMBOL_PRODUCT = 37,                   /* PRODUCT  */
-  YYSYMBOL_READ = 38,                      /* READ  */
-  YYSYMBOL_RIGHT_PAREN = 39,               /* RIGHT_PAREN  */
-  YYSYMBOL_RIGHT_SQ_BKT = 40,              /* RIGHT_SQ_BKT  */
-  YYSYMBOL_SEMICOLON = 41,                 /* SEMICOLON  */
-  YYSYMBOL_SKIP = 42,                      /* SKIP  */
-  YYSYMBOL_STRING = 43,                    /* STRING  */
-  YYSYMBOL_WHILE = 44,                     /* WHILE  */
-  YYSYMBOL_YYACCEPT = 45,                  /* $accept  */
-  YYSYMBOL_code = 46,                      /* code  */
-  YYSYMBOL_prog = 47,                      /* prog  */
-  YYSYMBOL_declList = 48,                  /* declList  */
-  YYSYMBOL_decl = 49,                      /* decl  */
-  YYSYMBOL_typeList = 50,                  /* typeList  */
-  YYSYMBOL_varList = 51,                   /* varList  */
-  YYSYMBOL_var = 52,                       /* var  */
-  YYSYMBOL_sizeListO = 53,                 /* sizeListO  */
-  YYSYMBOL_sizeList = 54,                  /* sizeList  */
-  YYSYMBOL_type = 55,                      /* type  */
-  YYSYMBOL_typeDef = 56,                   /* typeDef  */
-  YYSYMBOL_stmtListO = 57,                 /* stmtListO  */
-  YYSYMBOL_stmtList = 58,                  /* stmtList  */
-  YYSYMBOL_stmt = 59,                      /* stmt  */
-  YYSYMBOL_assignmentStmt = 60,            /* assignmentStmt  */
-  YYSYMBOL_dotId = 61,                     /* dotId  */
-  YYSYMBOL_readStmt = 62,                  /* readStmt  */
-  YYSYMBOL_printStmt = 63,                 /* printStmt  */
-  YYSYMBOL_ifStmt = 64,                    /* ifStmt  */
-  YYSYMBOL_elsePart = 65,                  /* elsePart  */
-  YYSYMBOL_whileStmt = 66,                 /* whileStmt  */
-  YYSYMBOL_exitLoop = 67,                  /* exitLoop  */
-  YYSYMBOL_skip = 68,                      /* skip  */
-  YYSYMBOL_id = 69,                        /* id  */
-  YYSYMBOL_indxListO = 70,                 /* indxListO  */
-  YYSYMBOL_indxList = 71,                  /* indxList  */
-  YYSYMBOL_bExp = 72,                      /* bExp  */
-  YYSYMBOL_relOP = 73,                     /* relOP  */
-  YYSYMBOL_exp = 74,                       /* exp  */
-  YYSYMBOL_epsilon = 75                    /* epsilon  */
+  YYSYMBOL_INT = 3,                        /* INT  */
+  YYSYMBOL_IF = 4,                         /* IF  */
+  YYSYMBOL_ELSE = 5,                       /* ELSE  */
+  YYSYMBOL_WHILE = 6,                      /* WHILE  */
+  YYSYMBOL_EQ = 7,                         /* EQ  */
+  YYSYMBOL_NE = 8,                         /* NE  */
+  YYSYMBOL_LE = 9,                         /* LE  */
+  YYSYMBOL_GE = 10,                        /* GE  */
+  YYSYMBOL_LT = 11,                        /* LT  */
+  YYSYMBOL_GT = 12,                        /* GT  */
+  YYSYMBOL_ID = 13,                        /* ID  */
+  YYSYMBOL_NUM = 14,                       /* NUM  */
+  YYSYMBOL_15_ = 15,                       /* '+'  */
+  YYSYMBOL_16_ = 16,                       /* '-'  */
+  YYSYMBOL_17_ = 17,                       /* '*'  */
+  YYSYMBOL_18_ = 18,                       /* '/'  */
+  YYSYMBOL_MOD = 19,                       /* MOD  */
+  YYSYMBOL_20_ = 20,                       /* '='  */
+  YYSYMBOL_21_ = 21,                       /* ';'  */
+  YYSYMBOL_22_ = 22,                       /* '('  */
+  YYSYMBOL_23_ = 23,                       /* ')'  */
+  YYSYMBOL_24_ = 24,                       /* '{'  */
+  YYSYMBOL_25_ = 25,                       /* '}'  */
+  YYSYMBOL_YYACCEPT = 26,                  /* $accept  */
+  YYSYMBOL_program = 27,                   /* program  */
+  YYSYMBOL_stmt_list = 28,                 /* stmt_list  */
+  YYSYMBOL_stmt = 29,                      /* stmt  */
+  YYSYMBOL_decl = 30,                      /* decl  */
+  YYSYMBOL_condition = 31,                 /* condition  */
+  YYSYMBOL_expr = 32,                      /* expr  */
+  YYSYMBOL_term = 33,                      /* term  */
+  YYSYMBOL_factor = 34                     /* factor  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -481,7 +370,7 @@ typedef int yytype_uint16;
 
 
 /* Stored state numbers (used for stacks). */
-typedef yytype_uint8 yy_state_t;
+typedef yytype_int8 yy_state_t;
 
 /* State numbers in computations.  */
 typedef int yy_state_fast_t;
@@ -690,21 +579,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  8
+#define YYFINAL  15
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   200
+#define YYLAST   65
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  45
+#define YYNTOKENS  26
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  31
+#define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  75
+#define YYNRULES  27
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  138
+#define YYNSTATES  60
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   299
+#define YYMAXUTOK   270
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -722,15 +611,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+      22,    23,    17,    15,     2,    16,     2,    18,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    21,
+       2,    20,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,    24,     2,    25,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -745,23 +634,16 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43,    44
+      19
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int16 yyrline[] =
+static const yytype_int8 yyrline[] =
 {
-       0,    83,    83,    88,    91,    92,    93,    94,    95,    96,
-      97,    98,    99,   100,   101,   102,   103,   104,   105,   106,
-     107,   108,   109,   110,   111,   112,   113,   135,   153,   154,
-     155,   156,   157,   158,   159,   160,   174,   175,   186,   199,
-     210,   223,   287,   288,   289,   333,   334,   335,   345,   346,
-     347,   358,   368,   389,   410,   420,   421,   467,   468,   469,
-     470,   471,   472,   473,   495,   517,   539,   561,   583,   602,
-     605,   627,   630,   634,   646,   658
+       0,    62,    62,    65,    66,    69,    70,    71,    79,    91,
+      94,    95,    98,    99,   100,   101,   102,   103,   106,   107,
+     108,   111,   112,   113,   114,   117,   118,   119
 };
 #endif
 
@@ -777,17 +659,11 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "AND", "ASSIGN",
-  "COLON", "COMMA", "DEF", "DIV", "DOT", "ELSE", "END", "EQ", "EXITLOOP",
-  "FLOAT", "FLOAT_CONST", "FORMAT", "GE", "GLOBAL", "GT", "ID", "IF",
-  "INT", "INT_CONST", "LEFT_PAREN", "LEFT_SQ_BKT", "LE", "LT", "MINUS",
-  "MOD", "MULT", "NE", "NOT", "NUL", "OR", "PLUS", "PRINT", "PRODUCT",
-  "READ", "RIGHT_PAREN", "RIGHT_SQ_BKT", "SEMICOLON", "SKIP", "STRING",
-  "WHILE", "$accept", "code", "prog", "declList", "decl", "typeList",
-  "varList", "var", "sizeListO", "sizeList", "type", "typeDef",
-  "stmtListO", "stmtList", "stmt", "assignmentStmt", "dotId", "readStmt",
-  "printStmt", "ifStmt", "elsePart", "whileStmt", "exitLoop", "skip", "id",
-  "indxListO", "indxList", "bExp", "relOP", "exp", "epsilon", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "INT", "IF", "ELSE",
+  "WHILE", "EQ", "NE", "LE", "GE", "LT", "GT", "ID", "NUM", "'+'", "'-'",
+  "'*'", "'/'", "MOD", "'='", "';'", "'('", "')'", "'{'", "'}'", "$accept",
+  "program", "stmt_list", "stmt", "decl", "condition", "expr", "term",
+  "factor", YY_NULLPTR
 };
 
 static const char *
@@ -797,7 +673,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-85)
+#define YYPACT_NINF (-11)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -809,22 +685,14 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-static const yytype_int16 yypact[] =
+static const yytype_int8 yypact[] =
 {
-       1,    19,    13,   -85,     7,    71,    19,   -85,   -85,     8,
-       6,    20,    25,   -85,   -85,    10,   159,    -2,    16,   -85,
-     159,    29,    17,   -85,   -85,    63,   -85,   -85,   -85,   -85,
-     -85,   -85,    37,   -85,   -85,    41,    56,   -85,    55,   -85,
-     -85,    61,   111,    61,   165,   -85,    62,   -85,   -85,   -85,
-     159,   165,   159,   165,   -85,     5,   129,   165,   -85,   165,
-      18,   -85,    71,   165,    65,     7,    46,    70,    69,    99,
-     -85,   102,   -85,   -85,   -85,   -85,   -85,   -85,   165,    60,
-     165,     3,    93,   143,   -85,   143,   159,    71,   159,   165,
-     165,   -85,   -85,   -85,   -85,   -85,   165,   165,   165,   -85,
-     165,   165,   141,   141,    71,   -85,   141,   -85,    33,   -85,
-      76,   111,    21,   -85,    68,   -85,   -85,   -85,    -3,   -85,
-     108,   -85,   143,   108,   108,   143,   141,    42,   -85,   -85,
-     -85,   -85,    71,   100,   -85,   -85,    17,   -85
+      31,   -10,    -9,    -4,     6,    31,    15,    31,   -11,   -11,
+      39,    -8,    -8,    -8,    -2,   -11,   -11,    -8,   -11,   -11,
+     -11,    -8,    10,    38,    21,   -11,    33,     4,   -11,    36,
+      -6,    31,    -8,    -8,    -8,    -8,    -8,    -8,    -8,    -8,
+      -8,    -8,    -8,    31,   -11,   -11,   -11,   -11,    46,    46,
+      46,    46,    46,    46,    21,    21,   -11,   -11,   -11,   -11
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -832,137 +700,77 @@ static const yytype_int16 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,    75,     0,     2,     0,    75,    75,     5,     1,    75,
-       0,     0,    11,     9,    45,    75,     0,     0,     0,    46,
-       0,     0,    24,    27,    28,     0,    29,    30,    31,    32,
-      33,    34,    36,    25,     4,     0,     0,    12,    13,    14,
-       6,     0,     0,     0,     0,    47,    48,    49,    74,    73,
-       0,     0,     0,     0,    72,     0,     0,     0,    39,     0,
-       0,     3,     0,     0,     0,     0,     0,     0,    75,     0,
-      18,    22,    17,    20,    19,     8,    21,    10,     0,     0,
-       0,     0,     0,    68,    54,    69,     0,     0,     0,     0,
-       0,    57,    60,    61,    58,    59,     0,     0,     0,    62,
-       0,     0,    40,    38,     0,    26,    35,    37,     0,    16,
-       0,     0,     0,    51,     0,    55,    71,    53,    75,    52,
-      66,    70,    64,    67,    65,    63,    56,     0,    23,    15,
-       7,    50,     0,     0,    43,    44,    42,    41
+       0,     0,     0,     0,     0,     0,     0,     2,     3,     5,
+       0,     0,     0,     0,     0,     1,     4,     0,    10,    25,
+      26,     0,     0,     0,    20,    24,     0,     0,     9,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     6,    11,    27,     7,    12,    13,
+      14,    15,    16,    17,    18,    19,    21,    22,    23,     8
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -85,   -85,   -85,   112,   -85,    64,    32,   -85,   -85,   -85,
-      15,   -40,   -85,   -84,    72,   -85,    66,   -85,   -85,   -85,
-     -85,   -85,   -85,   -85,    -5,   -85,   -85,   -16,   -85,   -35,
-      -4
+     -11,   -11,    16,    -7,   -11,    53,    -5,    25,     1
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_uint8 yydefgoto[] =
+static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     3,     5,     6,    10,    11,    12,    37,    38,
-      75,    13,    21,    22,    23,    24,    25,    26,    27,    28,
-     133,    29,    30,    31,    54,    45,    46,    55,   101,    56,
-       7
+       0,     6,     7,     8,     9,    22,    23,    24,    25
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule whose
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_uint8 yytable[] =
+static const yytype_int8 yytable[] =
 {
-      32,    33,    76,   118,    60,    39,    86,   132,    86,    79,
-      87,    47,    35,     8,    57,    82,    83,    40,    85,     1,
-     127,    86,   102,   104,   103,    42,     4,     9,   106,    89,
-      90,    43,    59,    36,    81,    44,    84,    88,    62,    88,
-      61,    58,   115,   112,   128,   114,    64,    41,   136,    96,
-      97,    98,    88,   135,   120,   121,   100,    32,    62,    32,
-     116,   122,   123,   124,    39,   125,   126,    63,    89,    90,
-     117,    76,   119,    69,    41,    77,    89,    90,    65,    66,
-      67,    68,    32,    62,    14,    15,   109,    80,    96,    97,
-      98,    15,    16,   110,    36,   100,    96,    97,    98,    32,
-     113,    89,    90,   100,   111,    91,    35,    17,   131,    18,
-      92,   137,    93,    19,   134,    20,   129,    90,    34,    94,
-      95,    96,    97,    98,    99,    70,   130,    32,   100,   108,
-     107,    71,   116,    72,   105,     0,     0,    89,    90,     0,
-       0,    91,     0,     0,    73,     0,    92,     0,    93,    89,
-      90,    89,    90,     0,    74,    94,    95,    96,    97,    98,
-      99,     0,     0,     0,   100,     0,     0,     0,     0,    96,
-      97,    98,    97,    98,    48,     0,   100,     0,     0,    15,
-      48,     0,    49,    50,     0,    15,     0,    51,    49,    78,
-       0,    52,     0,    51,    53,     0,     0,     0,     0,     0,
-      53
+      16,     1,     2,    10,     3,    19,    20,    16,    27,    38,
+      39,     4,    29,    11,    21,    15,    30,    46,    12,    38,
+      39,    14,     5,    28,    47,    44,    13,    48,    49,    50,
+      51,    52,    53,    31,     1,     2,    59,     3,    40,    41,
+      42,    56,    57,    58,     4,    32,    33,    34,    35,    36,
+      37,    38,    39,    38,    39,     5,    43,    45,     0,    17,
+      18,    38,    39,    54,    55,    26
 };
 
-static const yytype_int16 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       5,     5,    42,    87,    20,     9,     3,    10,     3,    44,
-       5,    15,     4,     0,    16,    50,    51,    11,    53,    18,
-     104,     3,    57,     5,    59,     5,     7,    20,    63,     8,
-       9,     6,    16,    25,    50,    25,    52,    34,    41,    34,
-      11,    43,    39,    78,    11,    80,     9,    41,   132,    28,
-      29,    30,    34,    11,    89,    90,    35,    62,    41,    64,
-      39,    96,    97,    98,    68,   100,   101,     4,     8,     9,
-      86,   111,    88,    41,    41,    43,     8,     9,    37,    23,
-      25,    20,    87,    41,    13,    20,    40,    25,    28,    29,
-      30,    20,    21,    23,    25,    35,    28,    29,    30,   104,
-      40,     8,     9,    35,     5,    12,     4,    36,    40,    38,
-      17,    11,    19,    42,   118,    44,    40,     9,     6,    26,
-      27,    28,    29,    30,    31,    14,   111,   132,    35,    65,
-      64,    20,    39,    22,    62,    -1,    -1,     8,     9,    -1,
-      -1,    12,    -1,    -1,    33,    -1,    17,    -1,    19,     8,
-       9,     8,     9,    -1,    43,    26,    27,    28,    29,    30,
-      31,    -1,    -1,    -1,    35,    -1,    -1,    -1,    -1,    28,
-      29,    30,    29,    30,    15,    -1,    35,    -1,    -1,    20,
-      15,    -1,    23,    24,    -1,    20,    -1,    28,    23,    24,
-      -1,    32,    -1,    28,    35,    -1,    -1,    -1,    -1,    -1,
-      35
+       7,     3,     4,    13,     6,    13,    14,    14,    13,    15,
+      16,    13,    17,    22,    22,     0,    21,    23,    22,    15,
+      16,     5,    24,    25,    31,    21,    20,    32,    33,    34,
+      35,    36,    37,    23,     3,     4,    43,     6,    17,    18,
+      19,    40,    41,    42,    13,     7,     8,     9,    10,    11,
+      12,    15,    16,    15,    16,    24,    23,    21,    -1,    20,
+      21,    15,    16,    38,    39,    12
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    18,    46,    47,     7,    48,    49,    75,     0,    20,
-      50,    51,    52,    56,    13,    20,    21,    36,    38,    42,
-      44,    57,    58,    59,    60,    61,    62,    63,    64,    66,
-      67,    68,    69,    75,    48,     4,    25,    53,    54,    75,
-      11,    41,     5,     6,    25,    70,    71,    75,    15,    23,
-      24,    28,    32,    35,    69,    72,    74,    16,    43,    16,
-      72,    11,    41,     4,     9,    37,    23,    25,    20,    51,
-      14,    20,    22,    33,    43,    55,    56,    51,    24,    74,
-      25,    72,    74,    74,    72,    74,     3,     5,    34,     8,
-       9,    12,    17,    19,    26,    27,    28,    29,    30,    31,
-      35,    73,    74,    74,     5,    59,    74,    61,    50,    40,
-      23,     5,    74,    40,    74,    39,    39,    72,    58,    72,
-      74,    74,    74,    74,    74,    74,    74,    58,    11,    40,
-      55,    40,    10,    65,    75,    11,    58,    11
+       0,     3,     4,     6,    13,    24,    27,    28,    29,    30,
+      13,    22,    22,    20,    28,     0,    29,    20,    21,    13,
+      14,    22,    31,    32,    33,    34,    31,    32,    25,    32,
+      32,    23,     7,     8,     9,    10,    11,    12,    15,    16,
+      17,    18,    19,    23,    21,    21,    23,    29,    32,    32,
+      32,    32,    32,    32,    33,    33,    34,    34,    34,    29
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    45,    46,    47,    48,    48,    49,    50,    50,    50,
-      51,    51,    52,    53,    53,    54,    54,    55,    55,    55,
-      55,    55,    55,    56,    57,    57,    58,    58,    59,    59,
-      59,    59,    59,    59,    59,    60,    61,    61,    62,    63,
-      63,    64,    65,    65,    66,    67,    68,    69,    70,    70,
-      71,    71,    72,    72,    72,    72,    72,    73,    73,    73,
-      73,    73,    73,    74,    74,    74,    74,    74,    74,    74,
-      74,    74,    74,    74,    74,    75
+       0,    26,    27,    28,    28,    29,    29,    29,    29,    29,
+      30,    30,    31,    31,    31,    31,    31,    31,    32,    32,
+      32,    33,    33,    33,    33,    34,    34,    34
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     4,     2,     1,     3,     5,     3,     1,
-       3,     1,     2,     1,     1,     4,     3,     1,     1,     1,
-       1,     1,     1,     5,     1,     1,     3,     1,     1,     1,
-       1,     1,     1,     1,     1,     3,     1,     3,     3,     2,
-       3,     6,     2,     1,     5,     1,     1,     2,     1,     1,
-       4,     3,     3,     3,     2,     3,     3,     1,     1,     1,
-       1,     1,     1,     3,     3,     3,     3,     3,     2,     2,
-       3,     3,     1,     1,     1,     0
+       0,     2,     1,     1,     2,     1,     4,     5,     5,     3,
+       3,     5,     3,     3,     3,     3,     3,     3,     3,     3,
+       1,     3,     3,     3,     1,     1,     1,     3
 };
 
 
@@ -1425,726 +1233,164 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* code: prog  */
-#line 83 "Q.y"
-                                                                {
-                                                                    outfile << "---------------" << endl; 
-                                                                    (yyvsp[0].block)->printCode(); 
-                                                                    outfile << "---------------" << endl; 
-                                                                }
-#line 1436 "y.tab.c"
+  case 5: /* stmt: decl  */
+#line 69 "Q.y"
+                                  { (yyval.str) = (yyvsp[0].str); }
+#line 1240 "y.tab.c"
     break;
 
-  case 3: /* prog: GLOBAL declList stmtListO END  */
-#line 88 "Q.y"
-                                                                {
-                                                                    (yyval.block) = (yyvsp[-1].block);
-                                                                }
-#line 1444 "y.tab.c"
+  case 6: /* stmt: ID '=' expr ';'  */
+#line 70 "Q.y"
+                                 { emit_assign((yyvsp[-1].str), (yyvsp[-3].str)); free((yyvsp[-3].str)); free((yyvsp[-1].str)); (yyval.str) = NULL; }
+#line 1246 "y.tab.c"
     break;
 
-  case 26: /* stmtList: stmtList SEMICOLON stmt  */
+  case 7: /* stmt: IF '(' condition ')' stmt  */
+#line 71 "Q.y"
+                                 { 
+        char* label = new_label();
+        emit_if((yyvsp[-2].str), label);
+        emit_label(label);
+        free((yyvsp[-2].str));
+        free(label);
+        (yyval.str) = NULL;
+    }
+#line 1259 "y.tab.c"
+    break;
+
+  case 8: /* stmt: WHILE '(' condition ')' stmt  */
+#line 79 "Q.y"
+                                   { 
+        char* l1 = new_label();
+        char* l2 = new_label();
+        emit_label(l1);
+        emit_if((yyvsp[-2].str), l2);
+        emit_jump(l1);
+        emit_label(l2);
+        free((yyvsp[-2].str));
+        free(l1);
+        free(l2);
+        (yyval.str) = NULL;
+    }
+#line 1276 "y.tab.c"
+    break;
+
+  case 9: /* stmt: '{' stmt_list '}'  */
+#line 91 "Q.y"
+                                 { (yyval.str) = NULL; }
+#line 1282 "y.tab.c"
+    break;
+
+  case 10: /* decl: INT ID ';'  */
+#line 94 "Q.y"
+                                 { emit_assign("0", (yyvsp[-1].str)); (yyval.str) = (yyvsp[-1].str); }
+#line 1288 "y.tab.c"
+    break;
+
+  case 11: /* decl: INT ID '=' expr ';'  */
+#line 95 "Q.y"
+                                { emit_assign((yyvsp[-1].str), (yyvsp[-3].str)); (yyval.str) = (yyvsp[-3].str); free((yyvsp[-1].str)); }
+#line 1294 "y.tab.c"
+    break;
+
+  case 12: /* condition: expr EQ expr  */
+#line 98 "Q.y"
+                                 { (yyval.str) = new_temp(); emit("==", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1300 "y.tab.c"
+    break;
+
+  case 13: /* condition: expr NE expr  */
+#line 99 "Q.y"
+                                { (yyval.str) = new_temp(); emit("!=", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1306 "y.tab.c"
+    break;
+
+  case 14: /* condition: expr LE expr  */
+#line 100 "Q.y"
+                                { (yyval.str) = new_temp(); emit("<=", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1312 "y.tab.c"
+    break;
+
+  case 15: /* condition: expr GE expr  */
+#line 101 "Q.y"
+                                { (yyval.str) = new_temp(); emit(">=", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1318 "y.tab.c"
+    break;
+
+  case 16: /* condition: expr LT expr  */
+#line 102 "Q.y"
+                                { (yyval.str) = new_temp(); emit("<", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1324 "y.tab.c"
+    break;
+
+  case 17: /* condition: expr GT expr  */
+#line 103 "Q.y"
+                                { (yyval.str) = new_temp(); emit(">", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1330 "y.tab.c"
+    break;
+
+  case 18: /* expr: expr '+' term  */
+#line 106 "Q.y"
+                                 { (yyval.str) = new_temp(); emit("+", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1336 "y.tab.c"
+    break;
+
+  case 19: /* expr: expr '-' term  */
+#line 107 "Q.y"
+                                { (yyval.str) = new_temp(); emit("-", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1342 "y.tab.c"
+    break;
+
+  case 20: /* expr: term  */
+#line 108 "Q.y"
+                                { (yyval.str) = (yyvsp[0].str); }
+#line 1348 "y.tab.c"
+    break;
+
+  case 21: /* term: term '*' factor  */
+#line 111 "Q.y"
+                                { (yyval.str) = new_temp(); emit("*", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1354 "y.tab.c"
+    break;
+
+  case 22: /* term: term '/' factor  */
+#line 112 "Q.y"
+                               { (yyval.str) = new_temp(); emit("/", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1360 "y.tab.c"
+    break;
+
+  case 23: /* term: term MOD factor  */
 #line 113 "Q.y"
-                                                                {
-                                                                    Block *b = new Block();
-                                                                    b->nextBlock = new Block();
-                                                                    (yyval.block) = b;
-
-                                                                    if((yyvsp[-2].block)->nextBlock==NULL)
-                                                                    {
-                                                                        (yyvsp[-2].block)->nextBlock = new Block();
-                                                                    }
-                                                                    (yyvsp[-2].block)->nextBlock->code->append(new_label());
-                                                                    (yyvsp[0].block)->nextBlock = b->nextBlock;
-
-                                                                    b->concat((yyvsp[-2].block));
-
-                                                                    Block *_1_next = new Block();
-                                                                    _1_next->labelBlock = &((yyvsp[-2].block)->nextBlock);
-
-                                                                    b->concat(_1_next);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
-                                                                    b->concat((yyvsp[0].block));
-                                                                }
-#line 1471 "y.tab.c"
+                               { (yyval.str) = new_temp(); emit("%", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
+#line 1366 "y.tab.c"
     break;
 
-  case 27: /* stmtList: stmt  */
-#line 135 "Q.y"
-                                                                {
-                                                                    if((yyvsp[0].block)->nextBlock == NULL)
-                                                                    {   
-                                                                        (yyvsp[0].block)->nextBlock = new Block();
-                                                                    }
-                                                                    (yyvsp[0].block)->nextBlock->code->append(new_label());
-
-                                                                    Block *b = new Block();
-                                                                    b->concat((yyvsp[0].block));
-
-                                                                    Block *_1_next = new Block();
-                                                                    _1_next->labelBlock = &((yyvsp[0].block)->nextBlock);
-                                                                    b->concat(_1_next);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
-
-                                                                    (yyval.block) = b;
-                                                                }
-#line 1494 "y.tab.c"
+  case 24: /* term: factor  */
+#line 114 "Q.y"
+                               { (yyval.str) = (yyvsp[0].str); }
+#line 1372 "y.tab.c"
     break;
 
-  case 33: /* stmt: exitLoop  */
-#line 158 "Q.y"
-                                                        { (yyval.block) = new Block(); }
-#line 1500 "y.tab.c"
+  case 25: /* factor: ID  */
+#line 117 "Q.y"
+                                { (yyval.str) = (yyvsp[0].str); }
+#line 1378 "y.tab.c"
     break;
 
-  case 34: /* stmt: skip  */
-#line 159 "Q.y"
-                                                    { (yyval.block) = new Block(); }
-#line 1506 "y.tab.c"
+  case 26: /* factor: NUM  */
+#line 118 "Q.y"
+                               { (yyval.str) = (char*)malloc(20); sprintf((yyval.str), "%d", (yyvsp[0].num)); }
+#line 1384 "y.tab.c"
     break;
 
-  case 35: /* assignmentStmt: dotId ASSIGN exp  */
-#line 160 "Q.y"
-                                                    {
-                                                        string c = (yyvsp[-2].block)->var;
-                                                        c+=" = ";
-                                                        c+=(yyvsp[0].block)->var;
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        Block *b = new Block();
-                                                        b->code = curr;
-
-                                                        b->concat(newline());
-                                                        (yyvsp[0].block)->concat(b);
-                                                        (yyval.block) = (yyvsp[0].block);
-                                                    }
-#line 1525 "y.tab.c"
-    break;
-
-  case 37: /* dotId: id DOT dotId  */
-#line 175 "Q.y"
-                                                    {
-                                                        string c = (yyvsp[-2].block)->var;
-                                                        c+=".";
-                                                        c+=(yyvsp[0].block)->var;
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        (yyval.block) = new Block();
-                                                        (yyval.block)->code = curr;
-                                                        (yyval.block)->var = c;
-                                                    }
-#line 1541 "y.tab.c"
-    break;
-
-  case 38: /* readStmt: READ FORMAT exp  */
-#line 186 "Q.y"
-                                                    {
-                                                        string c = (yyvsp[-2].code_str);
-                                                        c+=" ";
-                                                        c+=(yyvsp[-1].code_str);
-                                                        c+=" ";
-                                                        c+=(yyvsp[0].block)->code->code;
-
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        (yyval.block) = new Block();
-                                                        (yyval.block)->code = curr;
-                                                    }
-#line 1559 "y.tab.c"
-    break;
-
-  case 39: /* printStmt: PRINT STRING  */
-#line 199 "Q.y"
-                                                    {
-                                                        string c = (yyvsp[-1].code_str);
-                                                        c+=" ";
-                                                        c+=(yyvsp[0].code_str);
-
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        (yyval.block) = new Block();
-                                                        (yyval.block)->code = curr;
-                                                    }
-#line 1575 "y.tab.c"
-    break;
-
-  case 40: /* printStmt: PRINT FORMAT exp  */
-#line 210 "Q.y"
-                                                    {
-                                                        string c = (yyvsp[-2].code_str);
-                                                        c+=" ";
-                                                        c+=(yyvsp[-1].code_str);
-                                                        c+=" ";
-                                                        c+=(yyvsp[0].block)->code->code;
-
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        (yyval.block) = new Block();
-                                                        (yyval.block)->code = curr;
-                                                    }
-#line 1593 "y.tab.c"
-    break;
-
-  case 41: /* ifStmt: IF bExp COLON stmtList elsePart END  */
-#line 223 "Q.y"
-                                                                {
-                                                                    (yyvsp[-4].block)->trueBlock->code->append(new_label());
-
-                                                                    (yyval.block) = new Block();
-                                                                    (yyval.block)->nextBlock = new Block();
-
-                                                                    if((yyvsp[-1].block)==NULL)
-                                                                    {
-                                                                        (yyvsp[-4].block)->falseBlock = (yyval.block)->nextBlock;
-
-                                                                        (yyvsp[-2].block)->nextBlock = (yyval.block)->nextBlock;
-
-                                                                        (yyval.block)->concat((yyvsp[-4].block));
-
-                                                                        Block* _2_true = new Block();
-                                                                        _2_true->labelBlock = &((yyvsp[-4].block)->trueBlock);
-
-                                                                        (yyval.block)->concat(_2_true);
-                                                                        (yyval.block)->concat(colon());
-                                                                        (yyval.block)->concat(newline());
-                                                                        
-                                                                        (yyval.block)->concat((yyvsp[-2].block));
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        // Handle else part
-                                                                        (yyvsp[-1].block)->nextBlock = (yyval.block)->nextBlock;
-                                                                        (yyvsp[-4].block)->falseBlock->code->append(new_label());
-                                                                        (yyvsp[-4].block)->falseBlock = (yyvsp[-1].block)->nextBlock;
-                                                                        (yyvsp[-2].block)->nextBlock = (yyval.block)->nextBlock;
-
-                                                                        (yyval.block)->concat((yyvsp[-4].block));
-
-                                                                        Block* _2_true = new Block();
-                                                                        _2_true->labelBlock = &((yyvsp[-4].block)->trueBlock);
-
-                                                                        (yyval.block)->concat(_2_true);
-                                                                        (yyval.block)->concat(colon());
-                                                                        (yyval.block)->concat(newline());
-                                                                        
-                                                                        (yyval.block)->concat((yyvsp[-2].block));
-
-                                                                        Block* goto_block = new Block();
-                                                                        Code* goto_code = new Code();
-                                                                        goto_code->append("goto ");
-                                                                        goto_block->code = goto_code;
-
-                                                                        Block* _next_block = new Block();
-                                                                        _next_block->labelBlock = &((yyval.block)->nextBlock);
-                                                                        
-                                                                        goto_block->concat(_next_block);
-                                                                        (yyval.block)->concat(goto_block);
-                                                                        (yyval.block)->concat(newline());
-
-                                                                        Block* _5_next = new Block();
-                                                                        _5_next->labelBlock = &((yyvsp[-1].block)->nextBlock);
-
-                                                                        (yyval.block)->concat(_5_next);
-                                                                        (yyval.block)->concat(colon());
-                                                                        (yyval.block)->concat(newline());
-                                                                        
-                                                                        (yyval.block)->concat((yyvsp[-1].block));
-                                                                    }
-                                                                }
-#line 1662 "y.tab.c"
-    break;
-
-  case 42: /* elsePart: ELSE stmtList  */
-#line 287 "Q.y"
-                                                                {   (yyval.block) = (yyvsp[0].block);    }
-#line 1668 "y.tab.c"
-    break;
-
-  case 43: /* elsePart: epsilon  */
-#line 288 "Q.y"
-                                                                {   (yyval.block) = NULL;  }
-#line 1674 "y.tab.c"
-    break;
-
-  case 44: /* whileStmt: WHILE bExp COLON stmtList END  */
-#line 289 "Q.y"
-                                                                {
-                                                                    string begin = new_label();
-                                                                    (yyvsp[-3].block)->trueBlock->code->append(new_label());
-
-                                                                    Block* b = new Block();
-                                                                    (yyval.block) = b;
-                                                                    b->nextBlock = new Block();
-
-                                                                    (yyvsp[-3].block)->falseBlock = b->nextBlock;
-                                                                    if((yyvsp[-1].block)->nextBlock==NULL)
-                                                                        (yyvsp[-1].block)->nextBlock = new Block();
-                                                                    (yyvsp[-1].block)->nextBlock->code->append(begin);
-
-                                                                    Block* _begin = new Block();
-                                                                    _begin->labelBlock = &((yyvsp[-1].block)->nextBlock);
-
-                                                                    b->concat(_begin);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
-
-                                                                    b->concat((yyvsp[-3].block));
-
-                                                                    Block* b_true = new Block();
-                                                                    b_true->labelBlock = &((yyvsp[-3].block)->trueBlock);
-
-                                                                    b->concat(b_true);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
-                                                                    b->concat((yyvsp[-1].block));
-
-                                                                    string c = "goto ";
-                                                                    Code* curr = new Code();
-                                                                    curr->append(c);
-                                                                    Block* nb = new Block();
-                                                                    nb->code = curr;
-
-                                                                    b->concat(nb);
-
-                                                                    Block* _begin2 = new Block();
-                                                                    _begin2->labelBlock = &((yyvsp[-1].block)->nextBlock);
-
-                                                                    b->concat(_begin2);
-                                                                    b->concat(newline());
-                                                                }
-#line 1723 "y.tab.c"
-    break;
-
-  case 47: /* id: ID indxListO  */
-#line 335 "Q.y"
-                                                    {
-                                                        string c = (yyvsp[-1].code_str);
-                                                        c+=(yyvsp[0].block)->code->code;
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        (yyval.block) = new Block();
-                                                        // $$->code = curr;
-                                                        (yyval.block)->var = c;
-                                                    }
-#line 1738 "y.tab.c"
-    break;
-
-  case 50: /* indxList: indxList LEFT_SQ_BKT exp RIGHT_SQ_BKT  */
-#line 347 "Q.y"
-                                                                    {
-                                                                        string c = (yyvsp[-3].block)->code->code;
-                                                                        c+=(yyvsp[-2].code_str);
-                                                                        c+=(yyvsp[-1].block)->var;
-                                                                        c+=(yyvsp[0].code_str);
-                                                                        Code* curr = new Code();
-                                                                        curr->append(c);
-
-                                                                        (yyval.block) = new Block();
-                                                                        (yyval.block)->code = curr;
-                                                                    }
-#line 1754 "y.tab.c"
-    break;
-
-  case 51: /* indxList: LEFT_SQ_BKT exp RIGHT_SQ_BKT  */
-#line 358 "Q.y"
-                                                                    {
-                                                                        string c = (yyvsp[-2].code_str);
-                                                                        c+=(yyvsp[-1].block)->var;
-                                                                        c+=(yyvsp[0].code_str);
-                                                                        Code* curr = new Code();
-                                                                        curr->append(c);
-
-                                                                        (yyval.block) = new Block();
-                                                                        (yyval.block)->code = curr;
-                                                                    }
-#line 1769 "y.tab.c"
-    break;
-
-  case 52: /* bExp: bExp OR bExp  */
-#line 368 "Q.y"
-                                                            {
-                                                                Block* b = new Block();
-                                                                (yyval.block) = b;
-                                                                b->trueBlock = new Block();
-                                                                b->falseBlock = new Block();
-
-                                                                (yyvsp[-2].block)->trueBlock = b->trueBlock;
-                                                                (yyvsp[-2].block)->falseBlock->code->append(new_label());
-                                                                (yyvsp[0].block)->trueBlock = b->trueBlock;
-                                                                
-                                                                (yyvsp[0].block)->falseBlock = b->falseBlock;
-                                                                b->concat((yyvsp[-2].block));
-                                                                
-                                                                Block* _1_false = new Block();
-                                                                _1_false->labelBlock = &((yyvsp[-2].block)->falseBlock);
-                                                                b->concat(_1_false);
-                                                                b->concat(colon());
-                                                                b->concat(newline());
-
-                                                                b->concat((yyvsp[0].block));
-                                                            }
-#line 1795 "y.tab.c"
-    break;
-
-  case 53: /* bExp: bExp AND bExp  */
-#line 389 "Q.y"
-                                                            {
-                                                                Block* b = new Block();
-                                                                (yyval.block) = b;
-                                                                b->trueBlock = new Block();
-                                                                b->falseBlock = new Block();
-
-                                                                (yyvsp[-2].block)->trueBlock->code->append(new_label());
-                                                                (yyvsp[-2].block)->falseBlock = b->falseBlock;
-                                                                (yyvsp[0].block)->trueBlock = b->trueBlock;
-                                                                
-                                                                (yyvsp[0].block)->falseBlock = b->falseBlock;
-                                                                b->concat((yyvsp[-2].block));
-                                                                
-                                                                Block* _1_true = new Block();
-                                                                _1_true->labelBlock = &((yyvsp[-2].block)->trueBlock);
-                                                                b->concat(_1_true);
-                                                                b->concat(colon());
-                                                                b->concat(newline());
-
-                                                                b->concat((yyvsp[0].block));
-                                                            }
-#line 1821 "y.tab.c"
-    break;
-
-  case 54: /* bExp: NOT bExp  */
-#line 410 "Q.y"
-                                                            {
-                                                                (yyval.block) = new Block();
-                                                                (yyval.block)->trueBlock = new Block();
-                                                                (yyval.block)->falseBlock = new Block();
-
-                                                                (yyvsp[0].block)->trueBlock = (yyval.block)->falseBlock;
-                                                                (yyvsp[0].block)->falseBlock = (yyval.block)->trueBlock;
-                                                                
-                                                                (yyval.block)->concat((yyvsp[0].block));
-                                                            }
-#line 1836 "y.tab.c"
-    break;
-
-  case 55: /* bExp: LEFT_PAREN bExp RIGHT_PAREN  */
-#line 420 "Q.y"
-                                                            {   (yyval.block) = (yyvsp[-1].block);    }
-#line 1842 "y.tab.c"
-    break;
-
-  case 56: /* bExp: exp relOP exp  */
-#line 421 "Q.y"
-                                                            {
-                                                                Block *b = new Block();
-
-                                                                b->concat((yyvsp[-2].block));
-                                                                b->concat((yyvsp[0].block));
-
-                                                                Block *b1 = new Block();
-                                                                Code* curr1 = new Code();
-                                                                string c1 = "if ";
-                                                                c1+=(yyvsp[-2].block)->var;
-                                                                c1+=" ";
-                                                                c1+=(yyvsp[-1].code_str);
-                                                                c1+=" ";
-                                                                c1+=(yyvsp[0].block)->var;
-                                                                c1+=" goto ";
-
-                                                                curr1->append(c1);
-                                                                b1->code = curr1;
-
-                                                                b->concat(b1);
-                                                                b->trueBlock = new Block();
-
-                                                                Block *b_true = new Block();
-                                                                b_true->labelBlock = &(b->trueBlock);
-                                                                b->concat(b_true);
-
-                                                                b->concat(newline());
-
-                                                                Block* b2 = new Block();
-                                                                Code* curr2 = new Code();
-                                                                string c2 = "goto ";
-                                                                curr2->append(c2);
-                                                                b2->code = curr2;
-
-                                                                b->falseBlock = new Block();
-
-                                                                Block *b_false = new Block();
-                                                                b_false->labelBlock = &(b->falseBlock);
-                                                                
-                                                                b2->concat(b_false);
-
-                                                                b->concat(b2);
-                                                                b->concat(newline());
-
-                                                                (yyval.block) = b;
-                                                            }
-#line 1893 "y.tab.c"
-    break;
-
-  case 63: /* exp: exp PLUS exp  */
-#line 473 "Q.y"
-                                                            {
-                                                                (yyvsp[-2].block)->concat((yyvsp[0].block));
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=(yyvsp[-2].block)->var;
-                                                                c+=" + ";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[-2].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[-2].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 1920 "y.tab.c"
-    break;
-
-  case 64: /* exp: exp MINUS exp  */
-#line 495 "Q.y"
-                                                            {
-                                                                (yyvsp[-2].block)->concat((yyvsp[0].block));
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=(yyvsp[-2].block)->var;
-                                                                c+=" - ";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[-2].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[-2].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 1947 "y.tab.c"
-    break;
-
-  case 65: /* exp: exp MULT exp  */
-#line 517 "Q.y"
-                                                            {
-                                                                (yyvsp[-2].block)->concat((yyvsp[0].block));
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=(yyvsp[-2].block)->var;
-                                                                c+=" * ";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[-2].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[-2].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 1974 "y.tab.c"
-    break;
-
-  case 66: /* exp: exp DIV exp  */
-#line 539 "Q.y"
-                                                            {
-                                                                (yyvsp[-2].block)->concat((yyvsp[0].block));
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=(yyvsp[-2].block)->var;
-                                                                c+=" / ";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[-2].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[-2].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 2001 "y.tab.c"
-    break;
-
-  case 67: /* exp: exp MOD exp  */
-#line 561 "Q.y"
-                                                            {
-                                                                (yyvsp[-2].block)->concat((yyvsp[0].block));
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=(yyvsp[-2].block)->var;
-                                                                c+=" % ";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[-2].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[-2].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 2028 "y.tab.c"
-    break;
-
-  case 68: /* exp: MINUS exp  */
-#line 583 "Q.y"
-                                                            {   
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+="- ";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[0].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[0].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 2052 "y.tab.c"
-    break;
-
-  case 69: /* exp: PLUS exp  */
-#line 602 "Q.y"
-                                                            {   
-                                                                (yyval.block) = (yyvsp[0].block);
-                                                            }
-#line 2060 "y.tab.c"
-    break;
-
-  case 70: /* exp: exp DOT exp  */
-#line 605 "Q.y"
-                                                            {   
-                                                                (yyvsp[-2].block)->concat((yyvsp[0].block));
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=(yyvsp[-2].block)->var;
-                                                                c+=".";
-                                                                c+=(yyvsp[0].block)->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                (yyvsp[-2].block)->concat(b);
-                                                                
-                                                                (yyval.block) = (yyvsp[-2].block);
-                                                                (yyval.block)->var = var;
-                                                            }
-#line 2087 "y.tab.c"
-    break;
-
-  case 71: /* exp: LEFT_PAREN exp RIGHT_PAREN  */
-#line 627 "Q.y"
-                                                            {   
-                                                                (yyval.block) = (yyvsp[-1].block);
-                                                            }
-#line 2095 "y.tab.c"
-    break;
-
-  case 72: /* exp: id  */
-#line 630 "Q.y"
-                                                            {   
-                                                                (yyval.block) = new Block();
-                                                                (yyval.block)->var = (yyvsp[0].block)->var;
-                                                            }
-#line 2104 "y.tab.c"
-    break;
-
-  case 73: /* exp: INT_CONST  */
-#line 634 "Q.y"
-                                                            {   
-                                                                Code* c = new Code();
-                                                                string var = new_variable();
-                                                                c->append(var);
-                                                                c->append(" = ");
-                                                                c->append((yyvsp[0].code_str));
-                                                                (yyval.block) = new Block();
-
-                                                                (yyval.block)->code = c;
-                                                                (yyval.block)->var = var;
-                                                                (yyval.block)->concat(newline());
-                                                            }
-#line 2121 "y.tab.c"
-    break;
-
-  case 74: /* exp: FLOAT_CONST  */
-#line 646 "Q.y"
-                                                            {   
-                                                                Code* c = new Code();
-                                                                string var = new_variable();
-                                                                c->append(var);
-                                                                c->append(" = ");
-                                                                c->append((yyvsp[0].code_str));
-                                                                (yyval.block) = new Block();
-
-                                                                (yyval.block)->code = c;
-                                                                (yyval.block)->var = var;
-                                                                (yyval.block)->concat(newline());
-                                                            }
-#line 2138 "y.tab.c"
-    break;
-
-  case 75: /* epsilon: %empty  */
-#line 658 "Q.y"
-                                                            { (yyval.block) = new Block(); }
-#line 2144 "y.tab.c"
+  case 27: /* factor: '(' expr ')'  */
+#line 119 "Q.y"
+                               { (yyval.str) = (yyvsp[-1].str); }
+#line 1390 "y.tab.c"
     break;
 
 
-#line 2148 "y.tab.c"
+#line 1394 "y.tab.c"
 
       default: break;
     }
@@ -2337,52 +1583,14 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 659 "Q.y"
-  
+#line 122 "Q.y"
 
-int yyerror(char *s)    
-{   
-    fprintf(stderr, "%s in line no : %d - %s\n", s, yylineno, yytext);
-    exit(-1);
+
+void yyerror(char *s) {
+    fprintf(stderr, "Error: %s\n", s);
 }
 
-
-int main(int argc, char* argv[])
-{
-#if YYDEBUG
-    yydebug = 1;
-#endif
-
-    extern FILE *yyin;
-    const char* input_file = "input.txt";
-    const char* output_file = "output.txt";
-    
-    // Check if input file is provided as argument
-    if (argc > 1) {
-        input_file = argv[1];
-    }
-    
-    // Check if output file is provided as argument
-    if (argc > 2) {
-        output_file = argv[2];
-    }
-    
-    yyin = fopen(input_file, "r");
-    if (!yyin) {
-        fprintf(stderr, "Cannot open input file: %s\n", input_file);
-        return 1;
-    }
-    
-    outfile.open(output_file);
-    if (!outfile.is_open()) {
-        fprintf(stderr, "Cannot open output file: %s\n", output_file);
-        return 1;
-    }
-
+int main() {
     yyparse();
-
-    printf("Successfully parsed! Output written to %s\n", output_file);
-    outfile.close();
-
     return 0;
 }

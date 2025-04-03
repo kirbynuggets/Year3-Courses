@@ -1,9 +1,0 @@
-global
-	while a>10:
-		if i<10:
-			i:=i+1
-		end
-	end;
-
-	a := b + c
-end
