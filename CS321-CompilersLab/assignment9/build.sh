@@ -1,8 +1,8 @@
 #!/bin/bash
 
 echo "Compiling the lexical analyzer and parser..."
-bison -d -y parser.y
-flex lexA.l
+bison -d -y Q.y
+flex Q.l
 g++ -o compiler y.tab.c -lfl
 
 echo "Running the compiler on test inputs..."

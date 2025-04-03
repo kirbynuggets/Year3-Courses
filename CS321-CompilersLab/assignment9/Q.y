@@ -1,16 +1,15 @@
 %{
 #define YYDEBUG 0
 
-#include <iostream>
-#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-using namespace std;
-
-ofstream outfile;
+FILE *outfile;
 
 int yyerror(char *s);
 
-#include "block.hpp"
+#include "block.h"
 
 #include "y.tab.h"
 #include "lex.yy.c"
@@ -18,37 +17,36 @@ int yyerror(char *s);
 int var_index = 0;
 int label_index = 0;
 
-string new_variable()
+char* new_variable()
 {
-    string v = "v";
-    v+=to_string(var_index++);
+    char *v = (char*)malloc(20 * sizeof(char));
+    sprintf(v, "v%d", var_index++);
     return v;
 }
 
-string new_label()
+char* new_label()
 {
-    string label="_L";
-    label+=to_string(label_index++);
-    
+    char *label = (char*)malloc(20 * sizeof(char));
+    sprintf(label, "_L%d", label_index++);
     return label;
 }
 
 Block* newline()
 {
-    Block* block = new Block();
-    Code* curr = new Code();
-    curr->append("\n");
-    block->code=curr;
+    Block* block = (Block*)malloc(sizeof(Block));
+    Code* curr = (Code*)malloc(sizeof(Code));
+    curr->append = "\n";
+    block->code = curr;
 
     return block;
 }
 
 Block* colon()
 {
-    Block* block = new Block();
-    Code* curr = new Code();
-    curr->append(" :");
-    block->code=curr;
+    Block* block = (Block*)malloc(sizeof(Block));
+    Code* curr = (Code*)malloc(sizeof(Code));
+    curr->append = " :";
+    block->code = curr;
 
     return block;
 }
@@ -664,7 +662,6 @@ int yyerror(char *s)
     exit(-1);
 }
 
-
 int main(int argc, char* argv[])
 {
 #if YYDEBUG
@@ -691,8 +688,8 @@ int main(int argc, char* argv[])
         return 1;
     }
     
-    outfile.open(output_file);
-    if (!outfile.is_open()) {
+    FILE *outfile = fopen(output_file, "w");
+    if (!outfile) {
         fprintf(stderr, "Cannot open output file: %s\n", output_file);
         return 1;
     }
@@ -700,7 +697,7 @@ int main(int argc, char* argv[])
     yyparse();
 
     printf("Successfully parsed! Output written to %s\n", output_file);
-    outfile.close();
+    fclose(outfile);
 
     return 0;
 }
