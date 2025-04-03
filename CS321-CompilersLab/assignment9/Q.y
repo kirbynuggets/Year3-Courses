@@ -351,4 +351,266 @@ indxList            :   indxList LEFT_SQ_BKT exp RIGHT_SQ_BKT       {
                                                                         $$ = b;
                                                                     }   
                     |   LEFT_SQ_BKT exp RIGHT_SQ_BKT                {
-                                                                        char *c = str_concat(
+                        char *c = str_concat(3, $<code_str>1, $2->var, $<code_str>3);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+
+                                                                        $$ = b;
+                                                                    }
+exp                 :   exp PLUS exp                                 {
+                                                                        char *temp = new_variable();
+                                                                        char *c = str_concat(5, temp, " = ", $1->var, " + ", $3->var);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+
+                                                                        concatBlock(b, newline());
+                                                                        
+                                                                        concatBlock($1, $3);
+                                                                        concatBlock($1, b);
+                                                                        
+                                                                        free($1->var);
+                                                                        $1->var = temp;
+                                                                        
+                                                                        $$ = $1;
+                                                                    }
+                    |   exp MINUS exp                                {
+                                                                        char *temp = new_variable();
+                                                                        char *c = str_concat(5, temp, " = ", $1->var, " - ", $3->var);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+
+                                                                        concatBlock(b, newline());
+                                                                        
+                                                                        concatBlock($1, $3);
+                                                                        concatBlock($1, b);
+                                                                        
+                                                                        free($1->var);
+                                                                        $1->var = temp;
+                                                                        
+                                                                        $$ = $1;
+                                                                    }
+                    |   exp MULT exp                                 {
+                                                                        char *temp = new_variable();
+                                                                        char *c = str_concat(5, temp, " = ", $1->var, " * ", $3->var);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+
+                                                                        concatBlock(b, newline());
+                                                                        
+                                                                        concatBlock($1, $3);
+                                                                        concatBlock($1, b);
+                                                                        
+                                                                        free($1->var);
+                                                                        $1->var = temp;
+                                                                        
+                                                                        $$ = $1;
+                                                                    }
+                    |   exp DIV exp                                  {
+                                                                        char *temp = new_variable();
+                                                                        char *c = str_concat(5, temp, " = ", $1->var, " / ", $3->var);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+
+                                                                        concatBlock(b, newline());
+                                                                        
+                                                                        concatBlock($1, $3);
+                                                                        concatBlock($1, b);
+                                                                        
+                                                                        free($1->var);
+                                                                        $1->var = temp;
+                                                                        
+                                                                        $$ = $1;
+                                                                    }
+                    |   exp MOD exp                                  {
+                                                                        char *temp = new_variable();
+                                                                        char *c = str_concat(5, temp, " = ", $1->var, " % ", $3->var);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+
+                                                                        concatBlock(b, newline());
+                                                                        
+                                                                        concatBlock($1, $3);
+                                                                        concatBlock($1, b);
+                                                                        
+                                                                        free($1->var);
+                                                                        $1->var = temp;
+                                                                        
+                                                                        $$ = $1;
+                                                                    }
+                    |   LEFT_PAREN exp RIGHT_PAREN                  {
+                                                                        $$ = $2;
+                                                                    }
+                    |   INT_CONST                                    {
+                                                                        Block *b = createBlock();
+                                                                        free(b->var);
+                                                                        b->var = $<code_str>1;
+                                                                        $$ = b;
+                                                                    }
+                    |   FLOAT_CONST                                  {
+                                                                        Block *b = createBlock();
+                                                                        free(b->var);
+                                                                        b->var = $<code_str>1;
+                                                                        $$ = b;
+                                                                    }
+                    |   STRING                                       {
+                                                                        Block *b = createBlock();
+                                                                        free(b->var);
+                                                                        b->var = $<code_str>1;
+                                                                        $$ = b;
+                                                                    }
+                    |   dotId                                        {
+                                                                        $$ = $1;
+                                                                    }
+bExp                :   bExp AND bExp                               {
+                                                                        $1->trueBlock = createBlock();
+                                                                        $1->falseBlock = $3->falseBlock;
+                                                                        $3->trueBlock = createBlock();
+                                                                        
+                                                                        char *l1 = new_label();
+                                                                        appendCode($1->trueBlock->code, l1);
+                                                                        
+                                                                        Block *b = createBlock();
+                                                                        Block *_1_true = createBlock();
+                                                                        _1_true->labelBlock = &($1->trueBlock);
+                                                                        
+                                                                        concatBlock(b, $1);
+                                                                        concatBlock(b, _1_true);
+                                                                        concatBlock(b, colon());
+                                                                        concatBlock(b, newline());
+                                                                        concatBlock(b, $3);
+                                                                        
+                                                                        b->trueBlock = $3->trueBlock;
+                                                                        b->falseBlock = $3->falseBlock;
+                                                                        
+                                                                        $$ = b;
+                                                                        free(l1);
+                                                                    }
+                    |   bExp OR bExp                                {
+                                                                        $1->falseBlock = createBlock();
+                                                                        $1->trueBlock = $3->trueBlock;
+                                                                        $3->falseBlock = createBlock();
+                                                                        
+                                                                        char *l1 = new_label();
+                                                                        appendCode($1->falseBlock->code, l1);
+                                                                        
+                                                                        Block *b = createBlock();
+                                                                        Block *_1_false = createBlock();
+                                                                        _1_false->labelBlock = &($1->falseBlock);
+                                                                        
+                                                                        concatBlock(b, $1);
+                                                                        concatBlock(b, _1_false);
+                                                                        concatBlock(b, colon());
+                                                                        concatBlock(b, newline());
+                                                                        concatBlock(b, $3);
+                                                                        
+                                                                        b->trueBlock = $3->trueBlock;
+                                                                        b->falseBlock = $3->falseBlock;
+                                                                        
+                                                                        $$ = b;
+                                                                        free(l1);
+                                                                    }
+                    |   NOT bExp                                    {
+                                                                        Block *b = createBlock();
+                                                                        concatBlock(b, $2);
+                                                                        b->trueBlock = $2->falseBlock;
+                                                                        b->falseBlock = $2->trueBlock;
+                                                                        $$ = b;
+                                                                    }
+                    |   exp relOP exp                               {
+                                                                        char *temp = new_variable();
+                                                                        char *c = str_concat(5, temp, " = ", $1->var, " ", $<code_str>2);
+                                                                        char *c2 = str_concat(2, c, " ");
+                                                                        free(c);
+                                                                        c = str_concat(2, c2, $3->var);
+                                                                        free(c2);
+                                                                        
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
+                                                                        concatBlock(b, newline());
+                                                                        
+                                                                        concatBlock($1, $3);
+                                                                        concatBlock($1, b);
+                                                                        
+                                                                        $$ = $1;
+                                                                        $$->trueBlock = createBlock();
+                                                                        $$->falseBlock = createBlock();
+                                                                        
+                                                                        Block *ifBlock = createBlock();
+                                                                        appendCode(ifBlock->code, "if ");
+                                                                        appendCode(ifBlock->code, temp);
+                                                                        appendCode(ifBlock->code, " goto ");
+                                                                        
+                                                                        Block *gotoFalse = createBlock();
+                                                                        appendCode(gotoFalse->code, "goto ");
+                                                                        
+                                                                        concatBlock($$, ifBlock);
+                                                                        
+                                                                        Block *_true = createBlock();
+                                                                        _true->labelBlock = &($$->trueBlock);
+                                                                        
+                                                                        concatBlock($$, _true);
+                                                                        concatBlock($$, newline());
+                                                                        concatBlock($$, gotoFalse);
+                                                                        
+                                                                        Block *_false = createBlock();
+                                                                        _false->labelBlock = &($$->falseBlock);
+                                                                        
+                                                                        concatBlock($$, _false);
+                                                                        concatBlock($$, newline());
+                                                                        
+                                                                        free(temp);
+                                                                    }
+                    |   LEFT_PAREN bExp RIGHT_PAREN                 {   $$ = $2;    }
+relOP               :   LT                                          {   $$ = $1;    }
+                    |   LE                                          {   $$ = $1;    }
+                    |   GT                                          {   $$ = $1;    }
+                    |   GE                                          {   $$ = $1;    }
+                    |   EQ                                          {   $$ = $1;    }
+                    |   NE                                          {   $$ = $1;    }
+epsilon             :                                               {   $$ = createBlock();   }
+%%
+
+int yyerror(char *s) {
+    fprintf(stderr, "Error: %s at line %d\n", s, yylineno);
+    return 0;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Usage: %s <input_file> <output_file>\n", argv[0]);
+        return 1;
+    }
+    
+    FILE *input = fopen(argv[1], "r");
+    if (!input) {
+        printf("Could not open input file %s\n", argv[1]);
+        return 1;
+    }
+    
+    outfile = fopen(argv[2], "w");
+    if (!outfile) {
+        printf("Could not open output file %s\n", argv[2]);
+        fclose(input);
+        return 1;
+    }
+    
+    // Set input to yyin
+    extern FILE *yyin;
+    yyin = input;
+    
+    // Parse the input
+    yyparse();
+    
+    // Clean up
+    fclose(input);
+    fclose(outfile);
+    
+    return 0;
+}                                                                

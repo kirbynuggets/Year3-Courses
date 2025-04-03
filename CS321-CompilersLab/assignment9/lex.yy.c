@@ -541,8 +541,13 @@ char *yytext;
 #line 1 "Q.l"
 #line 2 "Q.l"
 #include <stdio.h>
-#line 545 "lex.yy.c"
-#line 546 "lex.yy.c"
+#include <stdlib.h>
+#include <string.h>
+#include "y.tab.h"
+
+extern YYSTYPE yylval;
+#line 550 "lex.yy.c"
+#line 551 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -759,9 +764,9 @@ YY_DECL
 		}
 
 	{
-#line 67 "Q.l"
+#line 70 "Q.l"
 
-#line 765 "lex.yy.c"
+#line 770 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -831,38 +836,35 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 68 "Q.l"
+#line 71 "Q.l"
 { }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 70 "Q.l"
+#line 73 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{format} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return FORMAT; 
                     }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 78 "Q.l"
+#line 80 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{int_const} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return INT_CONST; 
                     }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 85 "Q.l"
+#line 86 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{float_const} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return FLOAT_CONST; 
                     }
@@ -873,437 +875,398 @@ YY_RULE_SETUP
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{string} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return STRING; 
                     }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 100 "Q.l"
+#line 99 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{and} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return AND; 
                     }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 107 "Q.l"
+#line 105 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{assign} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return ASSIGN; 
                     }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 114 "Q.l"
+#line 111 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{colon} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return COLON; 
                     }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 121 "Q.l"
+#line 117 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{comma} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return COMMA; 
                     }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 128 "Q.l"
+#line 123 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{def} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return DEF; 
                     }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 135 "Q.l"
+#line 129 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{div} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return DIV; 
                     }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 142 "Q.l"
+#line 135 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{dot} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return DOT; 
                     }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 149 "Q.l"
+#line 141 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{else} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return ELSE; 
                     }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 156 "Q.l"
+#line 147 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{end} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return END; 
                     }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 163 "Q.l"
+#line 153 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{eq} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return EQ; 
                     }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 170 "Q.l"
+#line 159 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{exitloop} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return EXITLOOP; 
                     }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 177 "Q.l"
+#line 165 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{float} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return FLOAT; 
                     }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 184 "Q.l"
+#line 171 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{ge} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return GE; 
                     }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 191 "Q.l"
+#line 177 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{global} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return GLOBAL; 
                     }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 198 "Q.l"
+#line 183 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{gt} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return GT; 
                     }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 205 "Q.l"
+#line 189 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{if} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return IF; 
                     }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 212 "Q.l"
+#line 195 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{int} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return INT; 
                     }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 219 "Q.l"
+#line 201 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{left_paren} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return LEFT_PAREN; 
                     }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 226 "Q.l"
+#line 207 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{left_sq_bkt} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return LEFT_SQ_BKT; 
                     }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 233 "Q.l"
+#line 213 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{le} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return LE; 
                     }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 240 "Q.l"
+#line 219 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{lt} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return LT; 
                     }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 247 "Q.l"
+#line 225 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{minus} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return MINUS; 
                     }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 254 "Q.l"
+#line 231 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{mod} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return MOD; 
                     }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 261 "Q.l"
+#line 237 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{mult} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return MULT; 
                     }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 268 "Q.l"
+#line 243 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{ne} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return NE; 
                     }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 275 "Q.l"
+#line 249 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{not} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return NOT; 
                     }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 282 "Q.l"
+#line 255 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{nul} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return NUL; 
                     }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 289 "Q.l"
+#line 261 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{or} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return OR; 
                     }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 296 "Q.l"
+#line 267 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{plus} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return PLUS; 
                     }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 303 "Q.l"
+#line 273 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{print} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return PRINT; 
                     }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 310 "Q.l"
+#line 279 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{product} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return PRODUCT; 
                     }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 317 "Q.l"
+#line 285 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{read} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return READ; 
                     }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 324 "Q.l"
+#line 291 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{right_paren} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return RIGHT_PAREN; 
                     }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 331 "Q.l"
+#line 297 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{right_sq_bkt} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return RIGHT_SQ_BKT; 
                     }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 338 "Q.l"
+#line 303 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{semicolon} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return SEMICOLON; 
                     }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 345 "Q.l"
+#line 309 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{skip} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return SKIP; 
                     }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 352 "Q.l"
+#line 315 "Q.l"
 { 
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{while} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return WHILE; 
                     }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 360 "Q.l"
+#line 322 "Q.l"
 {
                          char *temp = (char*)malloc((strlen(yytext)+1)*sizeof(char));
                          strcpy(temp, yytext);
-                         // printf("{id} - %s\n", temp); 
                          yylval.code_str = temp; 
                          return ID; 
                     }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 367 "Q.l"
+#line 328 "Q.l"
 { }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 368 "Q.l"
+#line 329 "Q.l"
 { 
                         printf("- |%s|", yytext);
                         yyerror("Invalid character encountered!"); 
@@ -1312,10 +1275,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 373 "Q.l"
+#line 334 "Q.l"
 ECHO;
 	YY_BREAK
-#line 1319 "lex.yy.c"
+#line 1282 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2332,5 +2295,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 373 "Q.l"
+#line 334 "Q.l"
 
