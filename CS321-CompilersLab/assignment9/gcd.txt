@@ -1,0 +1,18 @@
+global
+    def
+        a, b, temp : int
+    end
+
+    read %d a;
+    read %d b;
+    
+    while a <> b:
+        if a > b:
+            a := a - b
+        else
+            b := b - a
+        end
+    end;
+    
+    print %d a
+end

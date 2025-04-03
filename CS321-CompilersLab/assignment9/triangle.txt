@@ -1,0 +1,13 @@
+global
+    def
+        base, height, area : float
+    end
+
+    read %f base;
+    read %f height;
+    
+    area := 0.5 * base * height;
+    
+    print "Triangle Area:";
+    print %f area
+end
