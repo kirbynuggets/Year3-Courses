@@ -8,11 +8,11 @@
 FILE *outfile;
 
 int yyerror(char *s);
+int yylex(void);
+extern int yylineno;
+extern char *yytext;
 
 #include "block.h"
-
-#include "y.tab.h"
-#include "lex.yy.c"
 
 int var_index = 0;
 int label_index = 0;
@@ -33,22 +33,44 @@ char* new_label()
 
 Block* newline()
 {
-    Block* block = (Block*)malloc(sizeof(Block));
-    Code* curr = (Code*)malloc(sizeof(Code));
-    curr->append = "\n";
-    block->code = curr;
-
+    Block* block = createBlock();
+    appendCode(block->code, "\n");
     return block;
 }
 
 Block* colon()
 {
-    Block* block = (Block*)malloc(sizeof(Block));
-    Code* curr = (Code*)malloc(sizeof(Code));
-    curr->append = " :";
-    block->code = curr;
-
+    Block* block = createBlock();
+    appendCode(block->code, " :");
     return block;
+}
+
+// Function to concatenate strings and create a new one
+char* str_concat(int count, ...) {
+    va_list args;
+    int total_length = 1; // Start with 1 for the null terminator
+    
+    // First pass: calculate total length
+    va_start(args, count);
+    for (int i = 0; i < count; i++) {
+        char* str = va_arg(args, char*);
+        if (str) total_length += strlen(str);
+    }
+    va_end(args);
+    
+    // Allocate memory for the result
+    char* result = (char*)malloc(total_length);
+    result[0] = '\0'; // Initialize to empty string
+    
+    // Second pass: concatenate strings
+    va_start(args, count);
+    for (int i = 0; i < count; i++) {
+        char* str = va_arg(args, char*);
+        if (str) strcat(result, str);
+    }
+    va_end(args);
+    
+    return result;
 }
 %}
 
@@ -76,12 +98,13 @@ Block* colon()
 %type <block> prog stmtListO stmtList epsilon stmt
 %type <block> assignmentStmt readStmt printStmt whileStmt ifStmt exitLoop skip
 %type <block> exp id indxListO indxList dotId elsePart bExp
+%type <code_str> relOP
 
 %%
 code                :   prog                                    {
-                                                                    outfile << "---------------" << endl; 
-                                                                    $1->printCode(); 
-                                                                    outfile << "---------------" << endl; 
+                                                                    fprintf(outfile, "---------------\n"); 
+                                                                    printBlock($1); 
+                                                                    fprintf(outfile, "---------------\n"); 
                                                                 }
 prog                :   GLOBAL declList stmtListO END           {
                                                                     $$ = $3;
@@ -109,42 +132,42 @@ typeDef             :   ID ASSIGN PRODUCT typeList END
 stmtListO           :   stmtList
                     |   epsilon
 stmtList            :   stmtList SEMICOLON stmt                 {
-                                                                    Block *b = new Block();
-                                                                    b->nextBlock = new Block();
+                                                                    Block *b = createBlock();
+                                                                    b->nextBlock = createBlock();
                                                                     $$ = b;
 
                                                                     if($1->nextBlock==NULL)
                                                                     {
-                                                                        $1->nextBlock = new Block();
+                                                                        $1->nextBlock = createBlock();
                                                                     }
-                                                                    $1->nextBlock->code->append(new_label());
+                                                                    appendCode($1->nextBlock->code, new_label());
                                                                     $3->nextBlock = b->nextBlock;
 
-                                                                    b->concat($1);
+                                                                    concatBlock(b, $1);
 
-                                                                    Block *_1_next = new Block();
+                                                                    Block *_1_next = createBlock();
                                                                     _1_next->labelBlock = &($1->nextBlock);
 
-                                                                    b->concat(_1_next);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
-                                                                    b->concat($3);
+                                                                    concatBlock(b, _1_next);
+                                                                    concatBlock(b, colon());
+                                                                    concatBlock(b, newline());
+                                                                    concatBlock(b, $3);
                                                                 }
                     |   stmt                                    {
                                                                     if($1->nextBlock == NULL)
                                                                     {   
-                                                                        $1->nextBlock = new Block();
+                                                                        $1->nextBlock = createBlock();
                                                                     }
-                                                                    $1->nextBlock->code->append(new_label());
+                                                                    appendCode($1->nextBlock->code, new_label());
 
-                                                                    Block *b = new Block();
-                                                                    b->concat($1);
+                                                                    Block *b = createBlock();
+                                                                    concatBlock(b, $1);
 
-                                                                    Block *_1_next = new Block();
+                                                                    Block *_1_next = createBlock();
                                                                     _1_next->labelBlock = &($1->nextBlock);
-                                                                    b->concat(_1_next);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
+                                                                    concatBlock(b, _1_next);
+                                                                    concatBlock(b, colon());
+                                                                    concatBlock(b, newline());
 
                                                                     $$ = b;
                                                                 }
@@ -153,551 +176,179 @@ stmt                :   assignmentStmt
                     |   printStmt
                     |   ifStmt
                     |   whileStmt
-                    |   exitLoop                        { $$ = new Block(); }
-                    |   skip                        { $$ = new Block(); }
+                    |   exitLoop                        { $$ = createBlock(); }
+                    |   skip                           { $$ = createBlock(); }
 assignmentStmt      :   dotId ASSIGN exp            {
-                                                        string c = $1->var;
-                                                        c+=" = ";
-                                                        c+=$3->var;
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
+                                                        char *c = str_concat(3, $1->var, " = ", $3->var);
+                                                        Block *b = createBlock();
+                                                        appendCode(b->code, c);
+                                                        free(c);
 
-                                                        Block *b = new Block();
-                                                        b->code = curr;
-
-                                                        b->concat(newline());
-                                                        $3->concat(b);
+                                                        concatBlock(b, newline());
+                                                        concatBlock($3, b);
                                                         $$ = $3;
                                                     }           
 dotId               :   id                          
                     |   id DOT dotId                {
-                                                        string c = $1->var;
-                                                        c+=".";
-                                                        c+=$3->var;
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        $$ = new Block();
-                                                        $$->code = curr;
-                                                        $$->var = c;
+                                                        char *c = str_concat(3, $1->var, ".", $3->var);
+                                                        Block *b = createBlock();
+                                                        appendCode(b->code, c);
+                                                        
+                                                        free($1->var);
+                                                        $1->var = strdup(c);
+                                                        free(c);
+                                                        
+                                                        $$ = $1;
                                                     }   
 readStmt            :   READ FORMAT exp             {
-                                                        string c = $<code_str>1;
-                                                        c+=" ";
-                                                        c+=$<code_str>2;
-                                                        c+=" ";
-                                                        c+=$3->code->code;
+                                                        char *c = str_concat(5, $<code_str>1, " ", $<code_str>2, " ", $3->var);
+                                                        Block *b = createBlock();
+                                                        appendCode(b->code, c);
+                                                        free(c);
 
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        $$ = new Block();
-                                                        $$->code = curr;
+                                                        $$ = b;
                                                     }
 printStmt           :   PRINT STRING                {
-                                                        string c = $<code_str>1;
-                                                        c+=" ";
-                                                        c+=$<code_str>2;
+                                                        char *c = str_concat(3, $<code_str>1, " ", $<code_str>2);
+                                                        Block *b = createBlock();
+                                                        appendCode(b->code, c);
+                                                        free(c);
 
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        $$ = new Block();
-                                                        $$->code = curr;
+                                                        $$ = b;
                                                     }
                     |   PRINT FORMAT exp            {
-                                                        string c = $<code_str>1;
-                                                        c+=" ";
-                                                        c+=$<code_str>2;
-                                                        c+=" ";
-                                                        c+=$3->code->code;
+                                                        char *c = str_concat(5, $<code_str>1, " ", $<code_str>2, " ", $3->var);
+                                                        Block *b = createBlock();
+                                                        appendCode(b->code, c);
+                                                        free(c);
 
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        $$ = new Block();
-                                                        $$->code = curr;
+                                                        $$ = b;
                                                     }
 ifStmt              :   IF bExp COLON stmtList elsePart END     {
-                                                                    $2->trueBlock->code->append(new_label());
+                                                                    appendCode($2->trueBlock->code, new_label());
 
-                                                                    $$ = new Block();
-                                                                    $$->nextBlock = new Block();
+                                                                    Block *b = createBlock();
+                                                                    b->nextBlock = createBlock();
+                                                                    $$ = b;
 
                                                                     if($5==NULL)
                                                                     {
-                                                                        $2->falseBlock = $$->nextBlock;
+                                                                        $2->falseBlock = b->nextBlock;
 
-                                                                        $4->nextBlock = $$->nextBlock;
+                                                                        $4->nextBlock = b->nextBlock;
 
-                                                                        $$->concat($2);
+                                                                        concatBlock(b, $2);
 
-                                                                        Block* _2_true = new Block();
+                                                                        Block* _2_true = createBlock();
                                                                         _2_true->labelBlock = &($2->trueBlock);
 
-                                                                        $$->concat(_2_true);
-                                                                        $$->concat(colon());
-                                                                        $$->concat(newline());
+                                                                        concatBlock(b, _2_true);
+                                                                        concatBlock(b, colon());
+                                                                        concatBlock(b, newline());
                                                                         
-                                                                        $$->concat($4);
+                                                                        concatBlock(b, $4);
                                                                     }
                                                                     else
                                                                     {
                                                                         // Handle else part
-                                                                        $5->nextBlock = $$->nextBlock;
-                                                                        $2->falseBlock->code->append(new_label());
+                                                                        $5->nextBlock = b->nextBlock;
+                                                                        appendCode($2->falseBlock->code, new_label());
                                                                         $2->falseBlock = $5->nextBlock;
-                                                                        $4->nextBlock = $$->nextBlock;
+                                                                        $4->nextBlock = b->nextBlock;
 
-                                                                        $$->concat($2);
+                                                                        concatBlock(b, $2);
 
-                                                                        Block* _2_true = new Block();
+                                                                        Block* _2_true = createBlock();
                                                                         _2_true->labelBlock = &($2->trueBlock);
 
-                                                                        $$->concat(_2_true);
-                                                                        $$->concat(colon());
-                                                                        $$->concat(newline());
+                                                                        concatBlock(b, _2_true);
+                                                                        concatBlock(b, colon());
+                                                                        concatBlock(b, newline());
                                                                         
-                                                                        $$->concat($4);
+                                                                        concatBlock(b, $4);
 
-                                                                        Block* goto_block = new Block();
-                                                                        Code* goto_code = new Code();
-                                                                        goto_code->append("goto ");
-                                                                        goto_block->code = goto_code;
+                                                                        Block* goto_block = createBlock();
+                                                                        appendCode(goto_block->code, "goto ");
 
-                                                                        Block* _next_block = new Block();
-                                                                        _next_block->labelBlock = &($$->nextBlock);
+                                                                        Block* _next_block = createBlock();
+                                                                        _next_block->labelBlock = &(b->nextBlock);
                                                                         
-                                                                        goto_block->concat(_next_block);
-                                                                        $$->concat(goto_block);
-                                                                        $$->concat(newline());
+                                                                        concatBlock(goto_block, _next_block);
+                                                                        concatBlock(b, goto_block);
+                                                                        concatBlock(b, newline());
 
-                                                                        Block* _5_next = new Block();
+                                                                        Block* _5_next = createBlock();
                                                                         _5_next->labelBlock = &($5->nextBlock);
 
-                                                                        $$->concat(_5_next);
-                                                                        $$->concat(colon());
-                                                                        $$->concat(newline());
+                                                                        concatBlock(b, _5_next);
+                                                                        concatBlock(b, colon());
+                                                                        concatBlock(b, newline());
                                                                         
-                                                                        $$->concat($5);
+                                                                        concatBlock(b, $5);
                                                                     }
                                                                 }
 elsePart            :   ELSE stmtList                           {   $$ = $2;    }
                     |   epsilon                                 {   $$ = NULL;  }
 whileStmt           :   WHILE bExp COLON stmtList END           {
-                                                                    string begin = new_label();
-                                                                    $2->trueBlock->code->append(new_label());
+                                                                    char *begin = new_label();
+                                                                    appendCode($2->trueBlock->code, new_label());
 
-                                                                    Block* b = new Block();
+                                                                    Block* b = createBlock();
                                                                     $$ = b;
-                                                                    b->nextBlock = new Block();
+                                                                    b->nextBlock = createBlock();
 
                                                                     $2->falseBlock = b->nextBlock;
                                                                     if($4->nextBlock==NULL)
-                                                                        $4->nextBlock = new Block();
-                                                                    $4->nextBlock->code->append(begin);
+                                                                        $4->nextBlock = createBlock();
+                                                                    appendCode($4->nextBlock->code, begin);
 
-                                                                    Block* _begin = new Block();
+                                                                    Block* _begin = createBlock();
                                                                     _begin->labelBlock = &($4->nextBlock);
 
-                                                                    b->concat(_begin);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
+                                                                    concatBlock(b, _begin);
+                                                                    concatBlock(b, colon());
+                                                                    concatBlock(b, newline());
 
-                                                                    b->concat($2);
+                                                                    concatBlock(b, $2);
 
-                                                                    Block* b_true = new Block();
+                                                                    Block* b_true = createBlock();
                                                                     b_true->labelBlock = &($2->trueBlock);
 
-                                                                    b->concat(b_true);
-                                                                    b->concat(colon());
-                                                                    b->concat(newline());
-                                                                    b->concat($4);
+                                                                    concatBlock(b, b_true);
+                                                                    concatBlock(b, colon());
+                                                                    concatBlock(b, newline());
+                                                                    concatBlock(b, $4);
 
-                                                                    string c = "goto ";
-                                                                    Code* curr = new Code();
-                                                                    curr->append(c);
-                                                                    Block* nb = new Block();
-                                                                    nb->code = curr;
+                                                                    Block* nb = createBlock();
+                                                                    appendCode(nb->code, "goto ");
 
-                                                                    b->concat(nb);
+                                                                    concatBlock(b, nb);
 
-                                                                    Block* _begin2 = new Block();
+                                                                    Block* _begin2 = createBlock();
                                                                     _begin2->labelBlock = &($4->nextBlock);
 
-                                                                    b->concat(_begin2);
-                                                                    b->concat(newline());
+                                                                    concatBlock(b, _begin2);
+                                                                    concatBlock(b, newline());
+                                                                    
+                                                                    free(begin);
                                                                 }
 exitLoop            :   EXITLOOP
 skip                :   SKIP
 id                  :   ID indxListO                {
-                                                        string c = $<code_str>1;
-                                                        c+=$2->code->code;
-                                                        Code* curr = new Code();
-                                                        curr->append(c);
-
-                                                        $$ = new Block();
-                                                        // $$->code = curr;
+                                                        char *c = str_concat(2, $<code_str>1, $2->code->code);
+                                                        $$ = createBlock();
+                                                        free($$->var);
                                                         $$->var = c;
                                                     }   
 indxListO           :   indxList
                     |   epsilon
 indxList            :   indxList LEFT_SQ_BKT exp RIGHT_SQ_BKT       {
-                                                                        string c = $1->code->code;
-                                                                        c+=$<code_str>2;
-                                                                        c+=$3->var;
-                                                                        c+=$<code_str>4;
-                                                                        Code* curr = new Code();
-                                                                        curr->append(c);
+                                                                        char *c = str_concat(4, $1->code->code, $<code_str>2, $3->var, $<code_str>4);
+                                                                        Block *b = createBlock();
+                                                                        appendCode(b->code, c);
+                                                                        free(c);
 
-                                                                        $$ = new Block();
-                                                                        $$->code = curr;
+                                                                        $$ = b;
                                                                     }   
                     |   LEFT_SQ_BKT exp RIGHT_SQ_BKT                {
-                                                                        string c = $<code_str>1;
-                                                                        c+=$2->var;
-                                                                        c+=$<code_str>3;
-                                                                        Code* curr = new Code();
-                                                                        curr->append(c);
-
-                                                                        $$ = new Block();
-                                                                        $$->code = curr;
-                                                                    }   
-bExp                :   bExp OR bExp                        {
-                                                                Block* b = new Block();
-                                                                $$ = b;
-                                                                b->trueBlock = new Block();
-                                                                b->falseBlock = new Block();
-
-                                                                $1->trueBlock = b->trueBlock;
-                                                                $1->falseBlock->code->append(new_label());
-                                                                $3->trueBlock = b->trueBlock;
-                                                                
-                                                                $3->falseBlock = b->falseBlock;
-                                                                b->concat($1);
-                                                                
-                                                                Block* _1_false = new Block();
-                                                                _1_false->labelBlock = &($1->falseBlock);
-                                                                b->concat(_1_false);
-                                                                b->concat(colon());
-                                                                b->concat(newline());
-
-                                                                b->concat($3);
-                                                            }
-                    |   bExp AND bExp                       {
-                                                                Block* b = new Block();
-                                                                $$ = b;
-                                                                b->trueBlock = new Block();
-                                                                b->falseBlock = new Block();
-
-                                                                $1->trueBlock->code->append(new_label());
-                                                                $1->falseBlock = b->falseBlock;
-                                                                $3->trueBlock = b->trueBlock;
-                                                                
-                                                                $3->falseBlock = b->falseBlock;
-                                                                b->concat($1);
-                                                                
-                                                                Block* _1_true = new Block();
-                                                                _1_true->labelBlock = &($1->trueBlock);
-                                                                b->concat(_1_true);
-                                                                b->concat(colon());
-                                                                b->concat(newline());
-
-                                                                b->concat($3);
-                                                            }
-                    |   NOT bExp                            {
-                                                                $$ = new Block();
-                                                                $$->trueBlock = new Block();
-                                                                $$->falseBlock = new Block();
-
-                                                                $2->trueBlock = $$->falseBlock;
-                                                                $2->falseBlock = $$->trueBlock;
-                                                                
-                                                                $$->concat($2);
-                                                            }
-                    |   LEFT_PAREN bExp RIGHT_PAREN         {   $$ = $2;    }
-                    |   exp relOP exp                       {
-                                                                Block *b = new Block();
-
-                                                                b->concat($1);
-                                                                b->concat($3);
-
-                                                                Block *b1 = new Block();
-                                                                Code* curr1 = new Code();
-                                                                string c1 = "if ";
-                                                                c1+=$1->var;
-                                                                c1+=" ";
-                                                                c1+=$<code_str>2;
-                                                                c1+=" ";
-                                                                c1+=$3->var;
-                                                                c1+=" goto ";
-
-                                                                curr1->append(c1);
-                                                                b1->code = curr1;
-
-                                                                b->concat(b1);
-                                                                b->trueBlock = new Block();
-
-                                                                Block *b_true = new Block();
-                                                                b_true->labelBlock = &(b->trueBlock);
-                                                                b->concat(b_true);
-
-                                                                b->concat(newline());
-
-                                                                Block* b2 = new Block();
-                                                                Code* curr2 = new Code();
-                                                                string c2 = "goto ";
-                                                                curr2->append(c2);
-                                                                b2->code = curr2;
-
-                                                                b->falseBlock = new Block();
-
-                                                                Block *b_false = new Block();
-                                                                b_false->labelBlock = &(b->falseBlock);
-                                                                
-                                                                b2->concat(b_false);
-
-                                                                b->concat(b2);
-                                                                b->concat(newline());
-
-                                                                $$ = b;
-                                                            }
-relOP               :   EQ
-                    |   LE
-                    |   LT
-                    |   GE
-                    |   GT
-                    |   NE
-exp                 :   exp PLUS exp                        {
-                                                                $1->concat($3);
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=$1->var;
-                                                                c+=" + ";
-                                                                c+=$3->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $1->concat(b);
-                                                                
-                                                                $$ = $1;
-                                                                $$->var = var;
-                                                            }
-                    |   exp MINUS exp                       {
-                                                                $1->concat($3);
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=$1->var;
-                                                                c+=" - ";
-                                                                c+=$3->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $1->concat(b);
-                                                                
-                                                                $$ = $1;
-                                                                $$->var = var;
-                                                            }
-                    |   exp MULT exp                        {
-                                                                $1->concat($3);
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=$1->var;
-                                                                c+=" * ";
-                                                                c+=$3->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $1->concat(b);
-                                                                
-                                                                $$ = $1;
-                                                                $$->var = var;
-                                                            }
-                    |   exp DIV exp                         {
-                                                                $1->concat($3);
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=$1->var;
-                                                                c+=" / ";
-                                                                c+=$3->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $1->concat(b);
-                                                                
-                                                                $$ = $1;
-                                                                $$->var = var;
-                                                            }
-                    |   exp MOD exp                         {
-                                                                $1->concat($3);
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=$1->var;
-                                                                c+=" % ";
-                                                                c+=$3->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $1->concat(b);
-                                                                
-                                                                $$ = $1;
-                                                                $$->var = var;
-                                                            }
-                    |   MINUS exp                           {   
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+="- ";
-                                                                c+=$2->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $2->concat(b);
-                                                                
-                                                                $$ = $2;
-                                                                $$->var = var;
-                                                            }
-                    |   PLUS exp                            {   
-                                                                $$ = $2;
-                                                            }
-                    |   exp DOT exp                         {   
-                                                                $1->concat($3);
-
-                                                                string var = new_variable();
-                                                                string c = var;
-                                                                c+=" = ";
-                                                                c+=$1->var;
-                                                                c+=".";
-                                                                c+=$3->var;
-                                                                
-                                                                Code* curr = new Code();
-                                                                curr->append(c);
-
-                                                                Block* b = new Block();
-                                                                b->code = curr;
-                                                                
-                                                                b->concat(newline());
-                                                                $1->concat(b);
-                                                                
-                                                                $$ = $1;
-                                                                $$->var = var;
-                                                            }
-                    |   LEFT_PAREN exp RIGHT_PAREN          {   
-                                                                $$ = $2;
-                                                            }
-                    |   id                                  {   
-                                                                $$ = new Block();
-                                                                $$->var = $1->var;
-                                                            }
-                    |   INT_CONST                           {   
-                                                                Code* c = new Code();
-                                                                string var = new_variable();
-                                                                c->append(var);
-                                                                c->append(" = ");
-                                                                c->append($<code_str>1);
-                                                                $$ = new Block();
-
-                                                                $$->code = c;
-                                                                $$->var = var;
-                                                                $$->concat(newline());
-                                                            }
-                    |   FLOAT_CONST                         {   
-                                                                Code* c = new Code();
-                                                                string var = new_variable();
-                                                                c->append(var);
-                                                                c->append(" = ");
-                                                                c->append($<code_str>1);
-                                                                $$ = new Block();
-
-                                                                $$->code = c;
-                                                                $$->var = var;
-                                                                $$->concat(newline());
-                                                            }
-epsilon             :                                       { $$ = new Block(); }
-%%  
-
-int yyerror(char *s)    
-{   
-    fprintf(stderr, "%s in line no : %d - %s\n", s, yylineno, yytext);
-    exit(-1);
-}
-
-int main(int argc, char* argv[])
-{
-#if YYDEBUG
-    yydebug = 1;
-#endif
-
-    extern FILE *yyin;
-    const char* input_file = "input.txt";
-    const char* output_file = "output.txt";
-    
-    // Check if input file is provided as argument
-    if (argc > 1) {
-        input_file = argv[1];
-    }
-    
-    // Check if output file is provided as argument
-    if (argc > 2) {
-        output_file = argv[2];
-    }
-    
-    yyin = fopen(input_file, "r");
-    if (!yyin) {
-        fprintf(stderr, "Cannot open input file: %s\n", input_file);
-        return 1;
-    }
-    
-    FILE *outfile = fopen(output_file, "w");
-    if (!outfile) {
-        fprintf(stderr, "Cannot open output file: %s\n", output_file);
-        return 1;
-    }
-
-    yyparse();
-
-    printf("Successfully parsed! Output written to %s\n", output_file);
-    fclose(outfile);
-
-    return 0;
-}
+                                                                        char *c = str_concat(
