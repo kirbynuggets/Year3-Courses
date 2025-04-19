@@ -40,6 +40,10 @@ void emit_jump(char* label) {
 void emit_if(char* cond, char* label) {
     printf("if %s goto %s\n", cond, label);
 }
+
+void emit_ifnot(char* cond, char* label) {
+    printf("ifFalse %s goto %s\n", cond, label);
+}
 %}
 
 %union {
@@ -69,23 +73,45 @@ stmt_list: stmt
 stmt: decl                        { $$ = $1; }
     | ID '=' expr ';'            { emit_assign($3, $1); free($1); free($3); $$ = NULL; }
     | IF '(' condition ')' stmt  { 
-        char* label = new_label();
-        emit_if($3, label);
-        emit_label(label);
+        char* else_label = new_label();
+        char* end_label = new_label();
+        
+        // Skip if condition is false
+        emit_ifnot($3, else_label);
+        
+        // "then" part was here
+        
+        emit_jump(end_label);
+        emit_label(else_label);
+        // "else" part would be here if we had an else clause
+        emit_label(end_label);
+        
         free($3);
-        free(label);
+        free(else_label);
+        free(end_label);
         $$ = NULL;
     }
     | WHILE '(' condition ')' stmt { 
-        char* l1 = new_label();
-        char* l2 = new_label();
-        emit_label(l1);
-        emit_if($3, l2);
-        emit_jump(l1);
-        emit_label(l2);
+        char* start_label = new_label();
+        char* end_label = new_label();
+        
+        // Start of loop
+        emit_label(start_label);
+        
+        // If condition is false, exit loop
+        emit_ifnot($3, end_label);
+        
+        // Loop body is handled by the nested stmt rule
+        
+        // Go back to check condition
+        emit_jump(start_label);
+        
+        // End of loop
+        emit_label(end_label);
+        
         free($3);
-        free(l1);
-        free(l2);
+        free(start_label);
+        free(end_label);
         $$ = NULL;
     }
     | '{' stmt_list '}'          { $$ = NULL; }
@@ -110,7 +136,7 @@ expr: expr '+' term              { $$ = new_temp(); emit("+", $1, $3, $$); free(
 
 term: term '*' factor           { $$ = new_temp(); emit("*", $1, $3, $$); free($1); free($3); }
     | term '/' factor          { $$ = new_temp(); emit("/", $1, $3, $$); free($1); free($3); }
-    | term MOD factor          { $$ = new_temp(); emit("%", $1, $3, $$); free($1); free($3); }  // Add this line
+    | term MOD factor          { $$ = new_temp(); emit("%", $1, $3, $$); free($1); free($3); }
     | factor                   { $$ = $1; }
     ;
 

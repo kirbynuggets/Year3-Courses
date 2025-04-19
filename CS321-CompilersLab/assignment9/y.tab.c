@@ -111,7 +111,11 @@ void emit_if(char* cond, char* label) {
     printf("if %s goto %s\n", cond, label);
 }
 
-#line 115 "y.tab.c"
+void emit_ifnot(char* cond, char* label) {
+    printf("ifFalse %s goto %s\n", cond, label);
+}
+
+#line 119 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -194,12 +198,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 45 "Q.y"
+#line 49 "Q.y"
 
     char* str;
     int num;
 
-#line 203 "y.tab.c"
+#line 207 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -639,11 +643,11 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    62,    62,    65,    66,    69,    70,    71,    79,    91,
-      94,    95,    98,    99,   100,   101,   102,   103,   106,   107,
-     108,   111,   112,   113,   114,   117,   118,   119
+       0,    66,    66,    69,    70,    73,    74,    75,    94,   117,
+     120,   121,   124,   125,   126,   127,   128,   129,   132,   133,
+     134,   137,   138,   139,   140,   143,   144,   145
 };
 #endif
 
@@ -1234,163 +1238,185 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* stmt: decl  */
-#line 69 "Q.y"
+#line 73 "Q.y"
                                   { (yyval.str) = (yyvsp[0].str); }
-#line 1240 "y.tab.c"
+#line 1244 "y.tab.c"
     break;
 
   case 6: /* stmt: ID '=' expr ';'  */
-#line 70 "Q.y"
+#line 74 "Q.y"
                                  { emit_assign((yyvsp[-1].str), (yyvsp[-3].str)); free((yyvsp[-3].str)); free((yyvsp[-1].str)); (yyval.str) = NULL; }
-#line 1246 "y.tab.c"
+#line 1250 "y.tab.c"
     break;
 
   case 7: /* stmt: IF '(' condition ')' stmt  */
-#line 71 "Q.y"
+#line 75 "Q.y"
                                  { 
-        char* label = new_label();
-        emit_if((yyvsp[-2].str), label);
-        emit_label(label);
+        char* else_label = new_label();
+        char* end_label = new_label();
+        
+        // Skip if condition is false
+        emit_ifnot((yyvsp[-2].str), else_label);
+        
+        // "then" part was here
+        
+        emit_jump(end_label);
+        emit_label(else_label);
+        // "else" part would be here if we had an else clause
+        emit_label(end_label);
+        
         free((yyvsp[-2].str));
-        free(label);
+        free(else_label);
+        free(end_label);
         (yyval.str) = NULL;
     }
-#line 1259 "y.tab.c"
+#line 1274 "y.tab.c"
     break;
 
   case 8: /* stmt: WHILE '(' condition ')' stmt  */
-#line 79 "Q.y"
+#line 94 "Q.y"
                                    { 
-        char* l1 = new_label();
-        char* l2 = new_label();
-        emit_label(l1);
-        emit_if((yyvsp[-2].str), l2);
-        emit_jump(l1);
-        emit_label(l2);
+        char* start_label = new_label();
+        char* end_label = new_label();
+        
+        // Start of loop
+        emit_label(start_label);
+        
+        // If condition is false, exit loop
+        emit_ifnot((yyvsp[-2].str), end_label);
+        
+        // Loop body is handled by the nested stmt rule
+        
+        // Go back to check condition
+        emit_jump(start_label);
+        
+        // End of loop
+        emit_label(end_label);
+        
         free((yyvsp[-2].str));
-        free(l1);
-        free(l2);
+        free(start_label);
+        free(end_label);
         (yyval.str) = NULL;
     }
-#line 1276 "y.tab.c"
+#line 1302 "y.tab.c"
     break;
 
   case 9: /* stmt: '{' stmt_list '}'  */
-#line 91 "Q.y"
+#line 117 "Q.y"
                                  { (yyval.str) = NULL; }
-#line 1282 "y.tab.c"
+#line 1308 "y.tab.c"
     break;
 
   case 10: /* decl: INT ID ';'  */
-#line 94 "Q.y"
+#line 120 "Q.y"
                                  { emit_assign("0", (yyvsp[-1].str)); (yyval.str) = (yyvsp[-1].str); }
-#line 1288 "y.tab.c"
+#line 1314 "y.tab.c"
     break;
 
   case 11: /* decl: INT ID '=' expr ';'  */
-#line 95 "Q.y"
+#line 121 "Q.y"
                                 { emit_assign((yyvsp[-1].str), (yyvsp[-3].str)); (yyval.str) = (yyvsp[-3].str); free((yyvsp[-1].str)); }
-#line 1294 "y.tab.c"
+#line 1320 "y.tab.c"
     break;
 
   case 12: /* condition: expr EQ expr  */
-#line 98 "Q.y"
+#line 124 "Q.y"
                                  { (yyval.str) = new_temp(); emit("==", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1300 "y.tab.c"
+#line 1326 "y.tab.c"
     break;
 
   case 13: /* condition: expr NE expr  */
-#line 99 "Q.y"
+#line 125 "Q.y"
                                 { (yyval.str) = new_temp(); emit("!=", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1306 "y.tab.c"
+#line 1332 "y.tab.c"
     break;
 
   case 14: /* condition: expr LE expr  */
-#line 100 "Q.y"
+#line 126 "Q.y"
                                 { (yyval.str) = new_temp(); emit("<=", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1312 "y.tab.c"
+#line 1338 "y.tab.c"
     break;
 
   case 15: /* condition: expr GE expr  */
-#line 101 "Q.y"
+#line 127 "Q.y"
                                 { (yyval.str) = new_temp(); emit(">=", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1318 "y.tab.c"
+#line 1344 "y.tab.c"
     break;
 
   case 16: /* condition: expr LT expr  */
-#line 102 "Q.y"
+#line 128 "Q.y"
                                 { (yyval.str) = new_temp(); emit("<", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1324 "y.tab.c"
+#line 1350 "y.tab.c"
     break;
 
   case 17: /* condition: expr GT expr  */
-#line 103 "Q.y"
+#line 129 "Q.y"
                                 { (yyval.str) = new_temp(); emit(">", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1330 "y.tab.c"
+#line 1356 "y.tab.c"
     break;
 
   case 18: /* expr: expr '+' term  */
-#line 106 "Q.y"
+#line 132 "Q.y"
                                  { (yyval.str) = new_temp(); emit("+", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1336 "y.tab.c"
+#line 1362 "y.tab.c"
     break;
 
   case 19: /* expr: expr '-' term  */
-#line 107 "Q.y"
+#line 133 "Q.y"
                                 { (yyval.str) = new_temp(); emit("-", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1342 "y.tab.c"
+#line 1368 "y.tab.c"
     break;
 
   case 20: /* expr: term  */
-#line 108 "Q.y"
+#line 134 "Q.y"
                                 { (yyval.str) = (yyvsp[0].str); }
-#line 1348 "y.tab.c"
+#line 1374 "y.tab.c"
     break;
 
   case 21: /* term: term '*' factor  */
-#line 111 "Q.y"
+#line 137 "Q.y"
                                 { (yyval.str) = new_temp(); emit("*", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1354 "y.tab.c"
+#line 1380 "y.tab.c"
     break;
 
   case 22: /* term: term '/' factor  */
-#line 112 "Q.y"
+#line 138 "Q.y"
                                { (yyval.str) = new_temp(); emit("/", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1360 "y.tab.c"
+#line 1386 "y.tab.c"
     break;
 
   case 23: /* term: term MOD factor  */
-#line 113 "Q.y"
+#line 139 "Q.y"
                                { (yyval.str) = new_temp(); emit("%", (yyvsp[-2].str), (yyvsp[0].str), (yyval.str)); free((yyvsp[-2].str)); free((yyvsp[0].str)); }
-#line 1366 "y.tab.c"
+#line 1392 "y.tab.c"
     break;
 
   case 24: /* term: factor  */
-#line 114 "Q.y"
+#line 140 "Q.y"
                                { (yyval.str) = (yyvsp[0].str); }
-#line 1372 "y.tab.c"
+#line 1398 "y.tab.c"
     break;
 
   case 25: /* factor: ID  */
-#line 117 "Q.y"
+#line 143 "Q.y"
                                 { (yyval.str) = (yyvsp[0].str); }
-#line 1378 "y.tab.c"
+#line 1404 "y.tab.c"
     break;
 
   case 26: /* factor: NUM  */
-#line 118 "Q.y"
+#line 144 "Q.y"
                                { (yyval.str) = (char*)malloc(20); sprintf((yyval.str), "%d", (yyvsp[0].num)); }
-#line 1384 "y.tab.c"
+#line 1410 "y.tab.c"
     break;
 
   case 27: /* factor: '(' expr ')'  */
-#line 119 "Q.y"
+#line 145 "Q.y"
                                { (yyval.str) = (yyvsp[-1].str); }
-#line 1390 "y.tab.c"
+#line 1416 "y.tab.c"
     break;
 
 
-#line 1394 "y.tab.c"
+#line 1420 "y.tab.c"
 
       default: break;
     }
@@ -1583,7 +1609,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 122 "Q.y"
+#line 148 "Q.y"
 
 
 void yyerror(char *s) {
