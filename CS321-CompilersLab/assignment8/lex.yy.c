@@ -507,12 +507,11 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "Q.l"
-/* lexer.l */
-#line 3 "Q.l"
+#line 2 "Q.l"
 #include "parser.tab.h"
 #include <string.h>
+#line 514 "lex.yy.c"
 #line 515 "lex.yy.c"
-#line 516 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -729,10 +728,10 @@ YY_DECL
 		}
 
 	{
-#line 7 "Q.l"
+#line 6 "Q.l"
 
 
-#line 736 "lex.yy.c"
+#line 735 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -792,150 +791,150 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 9 "Q.l"
+#line 8 "Q.l"
 /* ignore whitespace */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 11 "Q.l"
+#line 10 "Q.l"
 { return KINDLY; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 12 "Q.l"
+#line 11 "Q.l"
 { return FETCH; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 13 "Q.l"
+#line 12 "Q.l"
 { return DISPLAY; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 14 "Q.l"
+#line 13 "Q.l"
 { return EVERY; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 15 "Q.l"
+#line 14 "Q.l"
 { return DETAILS; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 16 "Q.l"
+#line 15 "Q.l"
 { return FOR; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 17 "Q.l"
+#line 16 "Q.l"
 { return STUDENTS; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 18 "Q.l"
+#line 17 "Q.l"
 { return LIST; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 19 "Q.l"
+#line 18 "Q.l"
 { return WITH; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 20 "Q.l"
+#line 19 "Q.l"
 { return VALUE; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 21 "Q.l"
+#line 20 "Q.l"
 { return HIGHER; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 22 "Q.l"
+#line 21 "Q.l"
 { return THAN; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 23 "Q.l"
+#line 22 "Q.l"
 { return LOWER; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 24 "Q.l"
+#line 23 "Q.l"
 { return SAME; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 25 "Q.l"
+#line 24 "Q.l"
 { return AS; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 26 "Q.l"
+#line 25 "Q.l"
 { return MODIFY; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 27 "Q.l"
+#line 26 "Q.l"
 { return CHANGE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 28 "Q.l"
+#line 27 "Q.l"
 { return TO; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 29 "Q.l"
+#line 28 "Q.l"
 { return CALLED; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 30 "Q.l"
+#line 29 "Q.l"
 { return ROLL; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 31 "Q.l"
+#line 30 "Q.l"
 { return ROLLS; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 32 "Q.l"
+#line 31 "Q.l"
 { return CPI; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 33 "Q.l"
+#line 32 "Q.l"
 { return CPIS; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 34 "Q.l"
+#line 33 "Q.l"
 { return NAMES; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 35 "Q.l"
+#line 34 "Q.l"
 { return AND; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 37 "Q.l"
+#line 36 "Q.l"
 { yylval.num = atof(yytext); return NUMBERVAL; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 39 "Q.l"
+#line 38 "Q.l"
 { /* ignore other characters */ }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 41 "Q.l"
+#line 40 "Q.l"
 ECHO;
 	YY_BREAK
-#line 939 "lex.yy.c"
+#line 938 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1940,7 +1939,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 41 "Q.l"
+#line 40 "Q.l"
 
 
 int yywrap() {
